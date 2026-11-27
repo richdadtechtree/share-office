@@ -417,7 +417,7 @@ main{ position:relative; z-index:1; max-width:1480px; margin:0 auto; padding:16p
 .zl-command{ left:30%;   top:26.5%; }
 html[data-theme="dark"] .zl-command{ background:rgba(22,32,58,.82); border-color:rgba(138,162,255,.3); }
 .zl-work{   left:28%;   top:50.5%; }
-.zl-lounge{ left:68%;   top:23%;   }
+.zl-lounge{ left:67.5%; top:29%;   }
 
 /* 프레임 하단 바 */
 .frame-foot{
@@ -997,7 +997,7 @@ html[data-theme="light"] .room-tab.is-active{
   .zl-meeting{ left:3%; top:4%; }
   .zl-command{ left:29%; top:27%; }
   .zl-work{ left:25%; top:51%; }
-  .zl-lounge{ left:66%; top:24%; }
+  .zl-lounge{ left:66%; top:30%; }
   .char{ width:38px; height:42px; }
   .char .bubble{ display:none; font-size:8px; max-width:110px; padding:2px 6px; }
   .char.is-selected .bubble{ display:inline-flex; }
