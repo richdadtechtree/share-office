@@ -346,6 +346,21 @@
     return best;
   }
 
+  function calmZone() {
+    var counts = {};
+    Object.keys(S.data.agents || {}).forEach(function (k) {
+      var a = S.data.agents[k];
+      if (a && a.zone) { counts[a.zone] = (counts[a.zone] || 0) + 1; }
+    });
+    var best = 'lounge';
+    var n = 1e9;
+    ZONE_ORDER.forEach(function (z) {
+      var c = counts[z] || 0;
+      if (c < n) { n = c; best = z; }
+    });
+    return best;
+  }
+
   function spawnPos(zoneId) {
     return spreadPosIn(S.data, zoneId, S.me && S.me.id);
   }
@@ -1655,10 +1670,13 @@
   function ensureMe() {
     var a = S.data.agents[S.me.id];
     if (!a) {
-      var p = spawnPos(S.me.zone || 'lounge');
+      var myZone = (S.me.zone && S.me.zone !== 'lounge') ? S.me.zone : calmZone();
+      var p = spawnPos(myZone);
+      S.me.zone = myZone;
+      storeSet(KEY.me, JSON.stringify(S.me));
       var obj = {
         id: S.me.id, name: S.me.name, kind: S.me.kind, color: S.me.color,
-        status: S.me.status || '여기 있어요', zone: S.me.zone || 'lounge', pos: p,
+        status: S.me.status || '여기 있어요', zone: myZone, pos: p,
         tagline: '나', createdBy: 'me', ts: Date.now(), updatedAt: Date.now()
       };
       S.data.agents[S.me.id] = obj;

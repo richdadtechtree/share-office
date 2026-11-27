@@ -381,7 +381,7 @@ main{ position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:8px
 .me-actions .btn{ flex:1; }
 
 .roster-card{ padding:14px; }
-.roster{ display:flex; flex-direction:column; gap:2px; max-height:372px; overflow:auto; }
+.roster{ display:flex; flex-direction:column; gap:2px; max-height:404px; overflow:auto; }
 .roster-item{
   display:flex; align-items:center; gap:9px; width:100%;
   padding:7px 6px; border-radius:10px; border:1px solid transparent; background:none;
