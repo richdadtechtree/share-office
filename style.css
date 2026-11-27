@@ -686,7 +686,7 @@ main{ position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:8px
   box-shadow:0 0 0 1px var(--line);
 }
 .swatch.is-active{ box-shadow:0 0 0 2px var(--ink); }
-.color-input{ width:26px; height:26px; padding:0; border:none; background:none; }
+.field .color-input{ width:30px; height:26px; padding:0; border:none; background:none; box-shadow:none; cursor:pointer; }
 .help-body{ display:flex; flex-direction:column; gap:12px; }
 .help-body section{ background:var(--panel-2); border:1px solid var(--line-soft); border-radius:12px; padding:11px 13px; }
 .help-body h3{ font-size:12.5px; margin-bottom:3px; }
