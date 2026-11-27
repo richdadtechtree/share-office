@@ -11,7 +11,7 @@
 <meta property="og:type" content="website" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230e1218'/%3E%3Crect x='7' y='7' width='18' height='5' rx='2.5' fill='%2372c286'/%3E%3Crect x='9' y='10' width='5' height='15' rx='2.5' fill='%2372c286'/%3E%3Crect x='18' y='10' width='5' height='15' rx='2.5' fill='%2372c286'/%3E%3Ccircle cx='11.5' cy='9.5' r='.9' fill='%23111'/%3E%3Ccircle cx='20.5' cy='9.5' r='.9' fill='%23111'/%3E%3C/svg%3E" />
 <link rel="preload" as="image" href="assets/office-floorplan.jpg" />
-<link rel="stylesheet" href="style.css?v=20261127r" />
+<link rel="stylesheet" href="style.css?v=20261127s" />
 </head>
 <body>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
@@ -78,31 +78,28 @@
       <div class="floor" id="floor" tabindex="0" role="application" aria-label="오피스 3D 평면도. 방 이름을 누르면 그 방 대화가 열리고, 바닥을 누르면 선택한 캐릭터가 그 자리로 걸어갑니다.">
         <div class="floor-img" aria-hidden="true"></div>
 
-        <div class="zone zone-meeting" data-zone="meeting">
-          <button class="zone-label zl-meeting" data-room="meeting" type="button">
-            <i aria-hidden="true">🏛️</i>
-            <span><b>대회의실</b><small>회의 · 프로젝트</small></span>
-          </button>
-        </div>
-        <div class="zone zone-command" data-zone="command">
-          <button class="zone-label zl-command" data-room="command" type="button">
-            <i aria-hidden="true">💙</i>
-            <span><b>지휘실</b><small>컨트롤 타워</small></span>
-          </button>
-        </div>
-        <div class="zone zone-work-a" data-zone="work">
-          <button class="zone-label zl-work" data-room="work" type="button">
-            <i aria-hidden="true">💻</i>
-            <span><b>워크스테이션</b><small>집중 업무</small></span>
-          </button>
-        </div>
+        <div class="zone zone-meeting" data-zone="meeting"></div>
+        <div class="zone zone-command" data-zone="command"></div>
+        <div class="zone zone-work-a" data-zone="work"></div>
         <div class="zone zone-work-b" data-zone="work"></div>
-        <div class="zone zone-lounge" data-zone="lounge">
-          <button class="zone-label zl-lounge" data-room="lounge" type="button">
-            <i aria-hidden="true">☕</i>
-            <span><b>라운지</b><small>커피 &amp; 사색</small></span>
-          </button>
-        </div>
+        <div class="zone zone-lounge" data-zone="lounge"></div>
+
+        <button class="zone-label zl-meeting" data-room="meeting" type="button">
+          <i aria-hidden="true">🏛️</i>
+          <span><b>대회의실</b><small>회의 · 프로젝트</small></span>
+        </button>
+        <button class="zone-label zl-command" data-room="command" type="button">
+          <i aria-hidden="true">💙</i>
+          <span><b>지휘실</b><small>컨트롤 타워</small></span>
+        </button>
+        <button class="zone-label zl-work" data-room="work" type="button">
+          <i aria-hidden="true">💻</i>
+          <span><b>워크스테이션</b><small>집중 업무</small></span>
+        </button>
+        <button class="zone-label zl-lounge" data-room="lounge" type="button">
+          <i aria-hidden="true">☕</i>
+          <span><b>라운지</b><small>커피 &amp; 사색</small></span>
+        </button>
 
         <div class="chars" id="chars"></div>
         <div class="move-ripple" id="move-ripple" hidden></div>
@@ -450,7 +447,7 @@
 
 <noscript><p class="noscript">합동 AI 오피스는 자바스크립트가 필요합니다. 브라우저 설정에서 자바스크립트를 켜 주세요.</p></noscript>
 
-<script src="config.js?v=20261127r"></script>
-<script src="app.js?v=20261127r"></script>
+<script src="config.js?v=20261127s"></script>
+<script src="app.js?v=20261127s"></script>
 </body>
 </html>
