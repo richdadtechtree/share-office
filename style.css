@@ -734,7 +734,7 @@ main{ position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:8px
   .brand-mark{ width:40px; height:40px; border-radius:13px; }
   .brand-mark svg{ width:26px; height:26px; }
   .brand-text h1{ font-size:17px; white-space:nowrap; }
-  .brand-text p{ font-size:9.5px; letter-spacing:.12em; }
+  .brand-text p{ display:none; }
   .only-wide{ display:none; }
   .conn-pill{ padding:6px 10px; font-size:11.5px; }
   #btn-invite{ padding:8px 11px; font-size:12.5px; }
