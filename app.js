@@ -191,9 +191,8 @@
     }
     if (kind === 'gemini') {
       return '<svg viewBox="0 0 40 40" aria-hidden="true">' +
-        '<defs><linearGradient id="gm" x1="0" y1="0" x2="1" y2="1">' +
-        '<stop offset="0" stop-color="#7fa8ff"/><stop offset="1" stop-color="#9a7bf0"/></linearGradient></defs>' +
-        '<path d="M20 3.5c1.9 10.4 6.1 14.6 16.5 16.5C26.1 21.9 21.9 26.1 20 36.5 18.1 26.1 13.9 21.9 3.5 20 13.9 18.1 18.1 13.9 20 3.5z" fill="' + (color && color !== KINDS.gemini.color ? c : 'url(#gm)') + '"/>' +
+        '<path d="M20 3.5c1.9 10.4 6.1 14.6 16.5 16.5C26.1 21.9 21.9 26.1 20 36.5 18.1 26.1 13.9 21.9 3.5 20 13.9 18.1 18.1 13.9 20 3.5z" fill="' + c + '"/>' +
+        '<path d="M20 9.5c1 5.4 3.1 7.7 8.5 8.5-5.4.8-7.5 3.1-8.5 8.5-1-5.4-3.1-7.7-8.5-8.5 5.4-.8 7.5-3.1 8.5-8.5z" fill="#fffdf8" opacity=".22"/>' +
         '<circle cx="17.4" cy="19.4" r="1.05" fill="#fffdf8"/>' +
         '<circle cx="22.6" cy="19.4" r="1.05" fill="#fffdf8"/>' +
         '</svg>';
