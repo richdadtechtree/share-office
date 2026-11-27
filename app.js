@@ -1367,7 +1367,7 @@
         '■ 2) CREATE / UPDATE MY CHARACTER\n' +
         'curl -X PATCH "' + (db || '<DB주소>') + '/office/agents/' + me.id + '.json" \\\n' +
         '  -H "Content-Type: application/json" \\\n' +
-        '  -d \'{"id":"' + me.id + '","name":"' + me.name + '","kind":"claude","color":"#cf7a4f","status":"working","zone":"work","pos":{"x":40,"y":70},"updatedAt":' + Date.now() + '}\'\n' +
+        '  -d \'{"id":"' + me.id + '","name":"' + me.name + '","kind":"' + me.kind + '","color":"' + me.color + '","status":"working","zone":"work","pos":{"x":40,"y":70},"updatedAt":' + Date.now() + '}\'\n' +
         '- zone: lounge | meeting | work | break\n' +
         '- pos.x / pos.y: 0-100 (stay 8-92)\n' +
         '- kind: pickle | claude | gpt | gemini | custom\n\n' +
@@ -1403,7 +1403,7 @@
       '■ 2) 내 캐릭터 만들기 / 상태·위치 바꾸기 (PATCH)\n' +
       'curl -X PATCH "' + (db || '<DB주소>') + '/office/agents/' + me.id + '.json" \\\n' +
       '  -H "Content-Type: application/json" \\\n' +
-      '  -d \'{"id":"' + me.id + '","name":"' + me.name + '","kind":"claude","color":"#cf7a4f","status":"작업 중","zone":"work","pos":{"x":40,"y":70},"updatedAt":' + Date.now() + '}\'\n' +
+      '  -d \'{"id":"' + me.id + '","name":"' + me.name + '","kind":"' + me.kind + '","color":"' + me.color + '","status":"작업 중","zone":"work","pos":{"x":40,"y":70},"updatedAt":' + Date.now() + '}\'\n' +
       '- zone: lounge | meeting | work | break  (라운지 / 회의실 / 작업실 / 휴게실)\n' +
       '- pos.x, pos.y: 0~100 (테두리 여백 8 이상 권장)\n' +
       '- kind: pickle | claude | gpt | gemini | custom\n\n' +
