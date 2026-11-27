@@ -280,14 +280,14 @@
   }
 
   /* 몸통 — 아래가 넓고 위가 좁은 통통한 모찌 */
-  var MOCHI = 'M32 12.6C39.4 12.6 46.6 16.8 50.2 24C53 29.8 53.6 36.4 53.4 42.2' +
-    'C53 52.6 45.4 61.6 32 61.6C18.6 61.6 11 52.6 10.6 42.2' +
-    'C10.4 36.4 11 29.8 13.8 24C17.4 16.8 24.6 12.6 32 12.6Z';
+  var MOCHI = 'M32 12.2C40 12.2 47.6 16.6 51.2 24.2C53.8 29.8 54.4 36.6 54.2 42.4' +
+    'C53.8 52.8 45.8 61.8 32 61.8C18.2 61.8 10.2 52.8 9.8 42.4' +
+    'C9.6 36.6 10.2 29.8 12.8 24.2C16.4 16.6 24 12.2 32 12.2Z';
 
   /* 몸 뒤쪽 — 짧은 발 두 개 */
   function feetSVG(u, t) {
-    return '<ellipse cx="25.2" cy="61.6" rx="5.6" ry="3.4" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="38.8" cy="61.6" rx="5.6" ry="3.4" fill="url(#' + u + 'b)"/>';
+    return '<ellipse cx="24.6" cy="61.8" rx="5.8" ry="3.5" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="39.4" cy="61.8" rx="5.8" ry="3.5" fill="url(#' + u + 'b)"/>';
   }
   /* 머리 꼭대기의 동글동글한 꼭지 */
   function nubSVG(u) {
@@ -321,10 +321,10 @@
   function mochiSVG(u, t, back, front) {
     return (back || '') +
       '<path d="' + MOCHI + '" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="23.4" cy="23.4" rx="10.4" ry="7" fill="url(#' + u + 's)" opacity=".5" transform="rotate(-32 23.4 23.4)"/>' +
-      '<ellipse cx="20.6" cy="20.4" rx="2.4" ry="1.6" fill="#ffffff" opacity=".6" transform="rotate(-32 20.6 20.4)"/>' +
+      '<ellipse cx="23.2" cy="22.8" rx="12" ry="8" fill="url(#' + u + 's)" opacity=".42" transform="rotate(-32 23.2 22.8)"/>' +
+      '<ellipse cx="20.4" cy="19.6" rx="2.2" ry="1.5" fill="#ffffff" opacity=".55" transform="rotate(-32 20.4 19.6)"/>' +
       (front || '') +
-      blushSVG(u, 19.4, 44.6, 40.4, 4.2, 2.5) +
+      blushSVG(u, 18.8, 45.2, 40.4, 4, 2.3) +
       eyesSVG(25.4, 38.6, 33.2, 3.5) +
       smileSVG(32, 40.6, 4.4);
   }
