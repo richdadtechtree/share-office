@@ -223,7 +223,7 @@
   }
   function smileSVG(cx, y, w) {
     return '<path d="M' + (cx - w / 2) + ' ' + y + 'q' + (w / 2) + ' ' + (w * 0.44) + ' ' + w + ' 0"' +
-      ' stroke="#6b4a3c" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-opacity=".82"/>';
+      ' stroke="#57392b" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-opacity=".9"/>';
   }
   function blushSVG(u, x1, x2, y, rx, ry) {
     return '<ellipse cx="' + x1 + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="url(#' + u + 'k)"/>' +
@@ -284,8 +284,8 @@
       '<ellipse cx="29.6" cy="14.6" rx="2.6" ry="5.4" fill="url(#' + u + 's)" opacity=".45" transform="rotate(-8 29.6 14.6)"/>' +
       '<path d="M52 44.5c.5 2.8 1.5 3.8 4.3 4.3-2.8.5-3.8 1.5-4.3 4.3-.5-2.8-1.5-3.8-4.3-4.3 2.8-.5 3.8-1.5 4.3-4.3z" fill="#ffffff" opacity=".45"/>' +
       blushSVG(u, 23.4, 40.6, 36, 2.2, 1.4) +
-      eyesSVG(27, 37, 31, 3) +
-      smileSVG(32, 35.4, 6.2);
+      eyesSVG(26.8, 37.2, 31, 3.2) +
+      smileSVG(32, 35.6, 6.6);
   }
 
   /* 커스텀 봇 — 안테나 + 바이저 얼굴 + 몸통 */
