@@ -403,9 +403,18 @@
       a.status = pool[Math.floor(Math.random() * pool.length)];
       a.updatedAt = now;
     } else if (r < 0.76) {
-      var targetZone = Math.random() < 0.24
-        ? ZONE_ORDER[Math.floor(Math.random() * ZONE_ORDER.length)]
-        : (a.zone || 'lounge');
+      var counts = {};
+      Object.keys(data.agents || {}).forEach(function (k) {
+        var o = data.agents[k];
+        if (o && o.zone) { counts[o.zone] = (counts[o.zone] || 0) + 1; }
+      });
+      var calm = ZONE_ORDER.slice().sort(function (x, y) { return (counts[x] || 0) - (counts[y] || 0); });
+      var targetZone;
+      if (Math.random() < 0.55 && (counts[a.zone] || 0) <= 2) {
+        targetZone = a.zone || 'lounge';
+      } else {
+        targetZone = calm[Math.floor(Math.random() * 2)];
+      }
       var p = spreadPosIn(data, targetZone, id);
       a.zone = targetZone;
       a.pos = p;
