@@ -332,6 +332,8 @@ main{ position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:8px
   max-width:92px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   box-shadow:0 1px 0 rgba(255,255,255,.6);
 }
+.char:hover{ z-index:5; }
+.char.is-selected{ z-index:6; }
 .char:hover .body{ transform:translateY(-3px) scale(1.05); box-shadow:0 8px 16px -8px rgba(70,52,28,.55); }
 .char:hover .bubble{ transform:translateY(-1px); }
 .char.is-selected .body{ box-shadow:0 0 0 3px rgba(90,168,100,.42), 0 8px 16px -8px rgba(70,52,28,.5); }

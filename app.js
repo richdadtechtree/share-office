@@ -341,6 +341,26 @@
 
   /* ══════════════════════ 4. 저장소 ══════════════════════ */
 
+  function spreadPosIn(data, zoneId, selfId) {
+    var best = randomPos(zoneId);
+    var bestD = -1;
+    for (var i = 0; i < 8; i++) {
+      var p = randomPos(zoneId);
+      var min = 1e9;
+      Object.keys(data.agents || {}).forEach(function (k) {
+        var o = data.agents[k];
+        if (!o || !o.pos || typeof o.pos.x !== 'number' || k === selfId) { return; }
+        var dx = o.pos.x - p.x;
+        var dy = (o.pos.y - p.y) * 1.7;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < min) { min = d; }
+      });
+      if (min > bestD) { bestD = min; best = p; }
+      if (min > 20) { break; }
+    }
+    return best;
+  }
+
   function DemoStore() {
     this.mode = 'demo';
     this.data = null;
@@ -396,7 +416,7 @@
       var targetZone = Math.random() < 0.24
         ? ZONE_ORDER[Math.floor(Math.random() * ZONE_ORDER.length)]
         : (a.zone || 'lounge');
-      var p = randomPos(targetZone);
+      var p = spreadPosIn(data, targetZone, id);
       a.zone = targetZone;
       a.pos = p;
       a.updatedAt = now;
