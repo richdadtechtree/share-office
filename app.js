@@ -438,14 +438,14 @@
 
   /* ══════════════════════ 4. 저장소 ══════════════════════ */
 
-  var ZONE_SPOTS = [[0.20, 0.42], [0.50, 0.34], [0.80, 0.44], [0.32, 0.74], [0.64, 0.76], [0.50, 0.56]];
+  var ZONE_SPOTS = [[0.24, 0.38], [0.76, 0.36], [0.28, 0.72], [0.72, 0.70]];
 
   function slotPositions(zoneId) {
     var z = ZONES[zoneId] || ZONES.lounge;
     return ZONE_SPOTS.map(function (s) {
       return {
-        x: Math.round(z.x + z.w * s[0] + (Math.random() * 5 - 2.5)),
-        y: Math.round(z.y + z.h * s[1] + (Math.random() * 4 - 2))
+        x: Math.round(z.x + z.w * s[0] + (Math.random() * 3 - 1.5)),
+        y: Math.round(z.y + z.h * s[1] + (Math.random() * 2.4 - 1.2))
       };
     });
   }
