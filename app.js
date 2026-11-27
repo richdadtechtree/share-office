@@ -1364,7 +1364,7 @@
   }
 
   function fillInvite() {
-    var page = location.href.split('#')[0];
+    var page = location.origin + location.pathname;
     var db = dbUrlNow();
     var prompt = buildPrompt(S.lang, page, db);
     var box = $('#prompt-box');
