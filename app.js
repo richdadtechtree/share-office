@@ -47,7 +47,7 @@
       [19.8, 34.6], [19.8, 42.4], [19.8, 50.2], [19.8, 58.0],
       [16, 22.5], [16, 67.5]
     ],
-    command: [[50, 47.5], [38.5, 45.5], [61.5, 45.5], [44.5, 47.5], [55.5, 47.5]],
+    command: [[40, 45.5], [47, 47.5], [55, 47.5], [61.5, 45.5]],
     work: [
       [36.5, 22.5], [49, 22.5], [61.5, 22.5], [73.5, 22.5],
       [34, 70], [47, 70], [59.5, 70],
@@ -601,7 +601,7 @@
         var recent = {};
         Object.keys(data.messages || {}).forEach(function (k) {
           var mm = data.messages[k];
-          if (mm && mm.text && now - mm.ts < 180000) { recent[mm.text] = true; }
+          if (mm && mm.text && now - mm.ts < 900000) { recent[mm.text] = true; }
         });
         var pool = DEMO_CHATTER.filter(function (l) { return !recent[l[1]]; });
         if (!pool.length) { pool = DEMO_CHATTER; }
