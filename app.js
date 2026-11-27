@@ -304,14 +304,17 @@
       '<circle cx="32" cy="3.8" r="3.2" fill="url(#' + u + 'b)"/>' +
       '<circle cx="30.9" cy="2.6" r="1" fill="#ffffff" opacity=".8"/>';
   }
-  /* 클로드 — 어깨 옆에 아주 작은 꽃점 */
-  function flowerSVG() {
-    var cx = 49, cy = 18.4, d = 2.9;
-    return '<circle cx="' + cx + '" cy="' + (cy - d) + '" r="2.2" fill="#fff8ec" opacity=".8"/>' +
-      '<circle cx="' + (cx + d) + '" cy="' + cy + '" r="2.2" fill="#fff8ec" opacity=".8"/>' +
-      '<circle cx="' + cx + '" cy="' + (cy + d) + '" r="2.2" fill="#fff8ec" opacity=".8"/>' +
-      '<circle cx="' + (cx - d) + '" cy="' + cy + '" r="2.2" fill="#fff8ec" opacity=".8"/>' +
-      '<circle cx="' + cx + '" cy="' + cy + '" r="1.7" fill="#ffffff" opacity=".92"/>';
+  /* 클로드 — 이마 옆에 아주 작은 여섯 갈래 별점(✳) */
+  function asteriskSVG(cx, cy, r, stroke, op) {
+    var out = '';
+    for (var i = 0; i < 6; i++) {
+      var a = (Math.PI / 3) * i + 0.26;
+      var dx = Math.cos(a) * r, dy = Math.sin(a) * r;
+      out += '<line x1="' + (cx + dx * 0.3).toFixed(2) + '" y1="' + (cy + dy * 0.3).toFixed(2) +
+        '" x2="' + (cx + dx).toFixed(2) + '" y2="' + (cy + dy).toFixed(2) +
+        '" stroke="' + stroke + '" stroke-width="1.7" stroke-linecap="round" opacity="' + op + '"/>';
+    }
+    return out;
   }
 
   /* 한 덩어리 모찌 — back(몸 뒤) + 몸통 + 광택 + front(몸 앞 장식) + 얼굴 */
@@ -320,7 +323,6 @@
       '<path d="' + MOCHI + '" fill="url(#' + u + 'b)"/>' +
       '<ellipse cx="23.4" cy="23.4" rx="10.4" ry="7" fill="url(#' + u + 's)" opacity=".5" transform="rotate(-32 23.4 23.4)"/>' +
       '<ellipse cx="20.6" cy="20.4" rx="2.4" ry="1.6" fill="#ffffff" opacity=".6" transform="rotate(-32 20.6 20.4)"/>' +
-      '<ellipse cx="32" cy="56.4" rx="11.6" ry="3.8" fill="#ffffff" opacity=".1"/>' +
       (front || '') +
       blushSVG(u, 19.4, 44.6, 40.4, 4.2, 2.5) +
       eyesSVG(25.4, 38.6, 33.2, 3.5) +
@@ -335,9 +337,9 @@
     var back = nubSVG(u) + feetSVG(u, t);
     var front = '';
     if (kind === 'pickle') { back = crownSVG(u) + feetSVG(u, t); }
-    else if (kind === 'claude') { front = flowerSVG(); }
+    else if (kind === 'claude') { front = asteriskSVG(45.2, 20.4, 4.6, '#fffaf0', '.85'); }
     else if (kind === 'gpt') { /* 아무 장식 없는 가장 둥근 모찌 */ }
-    else if (kind === 'gemini') { front = sparkleSVG(48.4, 17.6, 5, '#fdfaff', '.6'); }
+    else if (kind === 'gemini') { front = sparkleSVG(45.6, 19.4, 4.6, '#fdfaff', '.7'); }
     else { back = antennaSVG(u) + feetSVG(u, t); }
     var vb = small ? '7 0 50 66' : '0 0 64 72';
     var floorShadow = small ? '' :
