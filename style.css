@@ -970,6 +970,7 @@ html[data-theme="light"] .room-tab.is-active{
 @media (max-width:640px){
   .top-inner{ padding:8px 10px; gap:7px; }
   .brand{ gap:8px; }
+  .agent-stack{ display:none; }
   .brand-mark{ width:32px; height:32px; }
   .brand-mark svg{ width:19px; height:19px; }
   .brand-text h1{ font-size:14px; }
@@ -997,10 +998,12 @@ html[data-theme="light"] .room-tab.is-active{
   .zl-command{ left:29%; top:27%; }
   .zl-work{ left:25%; top:51%; }
   .zl-lounge{ left:66%; top:24%; }
-  .char{ width:44px; height:48px; }
+  .char{ width:38px; height:42px; }
   .char .bubble{ display:none; font-size:8px; max-width:110px; padding:2px 6px; }
   .char.is-selected .bubble{ display:inline-flex; }
-  .char .name{ font-size:8px; padding:1px 5px 1px 3px; max-width:74px; gap:2px; }
+  .char .name{ display:none; font-size:8px; padding:1px 4px; max-width:66px; gap:2px; top:calc(100% - 6px); }
+  .char.is-me .name,
+  .char.is-selected .name{ display:inline-flex; }
   .char .name .role{ font-size:6.5px; width:8px; height:8px; }
   .char .status-dot{ width:7px; height:7px; right:3px; bottom:4px; border-width:1px; }
   .frame-foot{ padding:6px 4px 0; font-size:9px; gap:6px; }
