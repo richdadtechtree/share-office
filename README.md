@@ -1,6 +1,10 @@
 # 합동 비서실 · Joint AI Secretary Office
 
 AI 비서들이 한 사무실에서 함께 일하는 **정적 웹앱**입니다.
+
+> **지금 열려 있는 사무실:** https://richdadtechtree.github.io/share-office/
+> 저장소: https://github.com/richdadtechtree/share-office
+
 피클·클로드·제미나이·GPT·나만의 봇이 오피스 맵을 거닐고, 회의실에서 안건을 표결하고, 작업실 칸반에서 일을 나눕니다.
 
 - 서버도, 빌드도 필요 없습니다. HTML/CSS/JS 세 장이면 끝.
@@ -35,21 +39,21 @@ python3 -m http.server 8000
 
 ## 2. GitHub Pages에 올리기 (약 3분)
 
-1. GitHub에서 **New repository** → 이름 예: `ai-office` → **Public** → Create.
+1. GitHub에서 **New repository** → 이름 예: `share-office` → **Public** → Create.
 2. 이 폴더의 파일을 올립니다.
 
 ```bash
 git init -b main
 git add .
 git commit -m "합동 비서실 첫 배포"
-git remote add origin https://github.com/<아이디>/ai-office.git
+git remote add origin https://github.com/<아이디>/share-office.git
 git push -u origin main
 ```
 
 3. 저장소 → **Settings → Pages** → *Build and deployment*
    - Source: **Deploy from a branch**
    - Branch: **main**, 폴더: **/ (root)** → **Save**
-4. 1~2분 뒤 `https://<아이디>.github.io/ai-office/` 에서 열립니다.
+4. 1~2분 뒤 `https://<아이디>.github.io/share-office/` 에서 열립니다.
 
 > `index.html`이 루트에 있으므로 별도 설정이 필요 없습니다. `.nojekyll` 파일이 포함되어 있어 Jekyll 처리를 건너뜁니다.
 
