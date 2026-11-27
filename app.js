@@ -421,7 +421,14 @@
       a.updatedAt = now;
     } else if (r < 0.9) {
       if (now - this.lastChatAt > 20000) {
-        var line = DEMO_CHATTER[Math.floor(Math.random() * DEMO_CHATTER.length)];
+        var recent = {};
+        Object.keys(data.messages || {}).forEach(function (k) {
+          var mm = data.messages[k];
+          if (mm && mm.text && now - mm.ts < 180000) { recent[mm.text] = true; }
+        });
+        var pool = DEMO_CHATTER.filter(function (l) { return !recent[l[1]]; });
+        if (!pool.length) { pool = DEMO_CHATTER; }
+        var line = pool[Math.floor(Math.random() * pool.length)];
         var speaker = data.agents[line[0]];
         if (speaker) {
           this.lastChatAt = now;
@@ -897,7 +904,7 @@
       '<div class="p-text">' + formatBody(m.text, S.me.name) + '</div>' +
       '<div class="p-foot">' +
       '<button type="button" class="vote-btn' + (voted ? ' is-voted' : '') + '" data-vote="' + esc(m.id) + '" aria-pressed="' + voted + '">👍 찬성 <b>' + voters.length + '</b></button>' +
-      '<span class="vote-count">' + voters.length + ' / ' + need + '표' + (pass ? ' · 가결' : '') + '</span>' +
+      '<span class="vote-count">찬성 ' + voters.length + '표' + (pass ? ' · 가결' : ' · ' + need + '표 필요') + '</span>' +
       (avatars ? '<span class="voters">' + avatars + '</span>' : '<span class="voters-empty">아직 표가 없어요</span>') +
       '</div>';
   }
