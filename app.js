@@ -151,61 +151,184 @@
     }
   }
 
-  /* ══════════════════════ 2. 캐릭터 SVG ══════════════════════ */
+  /* ══════════════════════ 2. 캐릭터 SVG ══════════════════════
+     입체(클레이 · 비닐 토이) 캐릭터.
+     빛은 언제나 왼쪽 위에서 오도록 gradientUnits="userSpaceOnUse"로 칠해
+     여러 조각이 하나의 찰흙 덩어리처럼 이어져 보이게 합니다. */
 
-  function kindSVG(kind, color) {
+  var SVG_SEQ = 0;
+
+  function rgbOf(hex) {
+    var h = String(hex === null || hex === undefined ? '' : hex).replace('#', '');
+    if (h.length === 3) { h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2]; }
+    if (!/^[0-9a-fA-F]{6}$/.test(h)) { h = '5aa864'; }
+    var n = parseInt(h, 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+  function mixHex(hex, to, amt) {
+    var a = rgbOf(hex);
+    var r = Math.round(a.r + (to[0] - a.r) * amt);
+    var g = Math.round(a.g + (to[1] - a.g) * amt);
+    var b = Math.round(a.b + (to[2] - a.b) * amt);
+    return '#' + ('00000' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16)).slice(-6);
+  }
+  function tonesOf(c) {
+    return {
+      hi: mixHex(c, [255, 255, 255], 0.8),
+      light: mixHex(c, [255, 255, 255], 0.45),
+      base: mixHex(c, [255, 255, 255], 0),
+      dark: mixHex(c, [38, 29, 22], 0.3),
+      deep: mixHex(c, [30, 22, 16], 0.55)
+    };
+  }
+  function figDefs(u, t) {
+    return '<defs>' +
+      '<linearGradient id="' + u + 'b" gradientUnits="userSpaceOnUse" x1="15" y1="5" x2="47" y2="74">' +
+        '<stop offset="0" stop-color="' + t.hi + '"/>' +
+        '<stop offset=".24" stop-color="' + t.light + '"/>' +
+        '<stop offset=".58" stop-color="' + t.base + '"/>' +
+        '<stop offset="1" stop-color="' + t.dark + '"/>' +
+      '</linearGradient>' +
+      '<radialGradient id="' + u + 'c" gradientUnits="userSpaceOnUse" cx="26" cy="24" r="27">' +
+        '<stop offset="0" stop-color="#fffefb"/>' +
+        '<stop offset=".52" stop-color="#f8eedf"/>' +
+        '<stop offset="1" stop-color="#ddceb3"/>' +
+      '</radialGradient>' +
+      '<radialGradient id="' + u + 's" cx="50%" cy="50%" r="50%">' +
+        '<stop offset="0" stop-color="#ffffff" stop-opacity=".92"/>' +
+        '<stop offset=".55" stop-color="#ffffff" stop-opacity=".3"/>' +
+        '<stop offset="1" stop-color="#ffffff" stop-opacity="0"/>' +
+      '</radialGradient>' +
+      '<radialGradient id="' + u + 'g" cx="50%" cy="50%" r="50%">' +
+        '<stop offset="0" stop-color="' + t.deep + '" stop-opacity=".42"/>' +
+        '<stop offset=".5" stop-color="' + t.deep + '" stop-opacity=".17"/>' +
+        '<stop offset="1" stop-color="' + t.deep + '" stop-opacity="0"/>' +
+      '</radialGradient>' +
+      '<radialGradient id="' + u + 'k" cx="50%" cy="50%" r="50%">' +
+        '<stop offset="0" stop-color="#ef8b90" stop-opacity=".6"/>' +
+        '<stop offset=".65" stop-color="#ef8b90" stop-opacity=".22"/>' +
+        '<stop offset="1" stop-color="#ef8b90" stop-opacity="0"/>' +
+      '</radialGradient>' +
+    '</defs>';
+  }
+
+  /* 얼굴 조각 */
+  function eyesSVG(x1, x2, y, r) {
+    function one(x) {
+      return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#3b3029"/>' +
+        '<circle cx="' + (x - r * 0.34).toFixed(2) + '" cy="' + (y - r * 0.42).toFixed(2) + '" r="' + (r * 0.4).toFixed(2) + '" fill="#ffffff" opacity=".95"/>' +
+        '<circle cx="' + (x + r * 0.34).toFixed(2) + '" cy="' + (y + r * 0.34).toFixed(2) + '" r="' + (r * 0.17).toFixed(2) + '" fill="#ffffff" opacity=".6"/>';
+    }
+    return one(x1) + one(x2);
+  }
+  function smileSVG(cx, y, w) {
+    return '<path d="M' + (cx - w / 2) + ' ' + y + 'q' + (w / 2) + ' ' + (w * 0.44) + ' ' + w + ' 0"' +
+      ' stroke="#6b4a3c" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-opacity=".82"/>';
+  }
+  function blushSVG(u, x1, x2, y, rx, ry) {
+    return '<ellipse cx="' + x1 + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="url(#' + u + 'k)"/>' +
+      '<ellipse cx="' + x2 + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="url(#' + u + 'k)"/>';
+  }
+
+  /* ㅍ 모양 피클 크리터 — 머리 막대 + 두 다리 + 앞발 */
+  function figPickle(u, t) {
+    return '<rect x="13.2" y="23" width="14.4" height="41" rx="7.2" fill="url(#' + u + 'b)"/>' +
+      '<rect x="36.4" y="23" width="14.4" height="41" rx="7.2" fill="url(#' + u + 'b)"/>' +
+      '<circle cx="13.6" cy="45" r="4.3" fill="url(#' + u + 'b)"/>' +
+      '<circle cx="50.4" cy="45" r="4.3" fill="url(#' + u + 'b)"/>' +
+      '<rect x="6.5" y="8.5" width="51" height="25" rx="12" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="20.4" cy="62.6" rx="7.5" ry="3.2" fill="' + t.deep + '" opacity=".2"/>' +
+      '<ellipse cx="43.6" cy="62.6" rx="7.5" ry="3.2" fill="' + t.deep + '" opacity=".2"/>' +
+      '<ellipse cx="18.6" cy="42" rx="3.1" ry="11.5" fill="url(#' + u + 's)" opacity=".34"/>' +
+      '<ellipse cx="41.8" cy="42" rx="3.1" ry="11.5" fill="url(#' + u + 's)" opacity=".34"/>' +
+      '<ellipse cx="20.6" cy="14.6" rx="11" ry="4.3" fill="url(#' + u + 's)" opacity=".55" transform="rotate(-6 20.6 14.6)"/>' +
+      blushSVG(u, 14.8, 49.2, 27.8, 3.5, 2.2) +
+      eyesSVG(22.8, 41.2, 21.4, 4.6) +
+      smileSVG(32, 27.8, 7.2);
+  }
+
+  /* 클로드 — 여섯 갈래 별 인형 + 크림색 얼굴 */
+  function figClaude(u) {
+    var spokes = '';
+    [0, 60, 120].forEach(function (a) {
+      spokes += '<rect x="27.3" y="14.5" width="9.4" height="44" rx="4.7" fill="url(#' + u + 'b)"' +
+        (a ? ' transform="rotate(' + a + ' 32 36.5)"' : '') + '/>';
+    });
+    return spokes +
+      '<ellipse cx="32" cy="18.6" rx="3" ry="4.4" fill="url(#' + u + 's)" opacity=".32"/>' +
+      '<circle cx="32" cy="36.5" r="12.8" fill="url(#' + u + 'c)"/>' +
+      '<circle cx="32" cy="36.5" r="12.8" fill="none" stroke="#ffffff" stroke-opacity=".45" stroke-width="1"/>' +
+      '<ellipse cx="27.6" cy="30.6" rx="6.2" ry="4.4" fill="url(#' + u + 's)" opacity=".6" transform="rotate(-25 27.6 30.6)"/>' +
+      blushSVG(u, 24.6, 39.4, 39.4, 1.9, 1.2) +
+      eyesSVG(28.6, 35.4, 36, 2.7) +
+      smileSVG(32, 39.8, 5.4);
+  }
+
+  /* GPT — 둥근 마시멜로 몸 + 짧은 발 */
+  function figGpt(u, t) {
+    return '<ellipse cx="23.5" cy="58.6" rx="7.6" ry="4.4" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="40.5" cy="58.6" rx="7.6" ry="4.4" fill="url(#' + u + 'b)"/>' +
+      '<rect x="10.5" y="15" width="43" height="43" rx="16.5" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="23.4" cy="61.4" rx="6.8" ry="2.2" fill="' + t.deep + '" opacity=".18"/>' +
+      '<ellipse cx="40.6" cy="61.4" rx="6.8" ry="2.2" fill="' + t.deep + '" opacity=".18"/>' +
+      '<ellipse cx="21.8" cy="23.6" rx="10.5" ry="6" fill="url(#' + u + 's)" opacity=".5" transform="rotate(-18 21.8 23.6)"/>' +
+      '<path d="M46 18.4c.5 3 1.6 4.1 4.6 4.6-3 .5-4.1 1.6-4.6 4.6-.5-3-1.6-4.1-4.6-4.6 3-.5 4.1-1.6 4.6-4.6z" fill="#ffffff" opacity=".42"/>' +
+      blushSVG(u, 15.8, 48.2, 41.6, 3.3, 2.1) +
+      eyesSVG(24.6, 39.4, 34.6, 4.7) +
+      smileSVG(32, 41.8, 7.4);
+  }
+
+  /* 제미나이 — 네 갈래 반짝이 + 작은 얼굴 */
+  function figGemini(u) {
+    return '<path d="M32 8.5C33.4 24.2 37.8 28.6 53.5 30 37.8 31.4 33.4 35.8 32 51.5 30.6 35.8 26.2 31.4 10.5 30 26.2 28.6 30.6 24.2 32 8.5Z" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="30" cy="16.6" rx="2.3" ry="5" fill="url(#' + u + 's)" opacity=".4" transform="rotate(-6 30 16.6)"/>' +
+      '<path d="M49 41.5c.4 2.4 1.3 3.3 3.7 3.7-2.4.4-3.3 1.3-3.7 3.7-.4-2.4-1.3-3.3-3.7-3.7 2.4-.4 3.3-1.3 3.7-3.7z" fill="#ffffff" opacity=".5"/>' +
+      blushSVG(u, 24.6, 39.4, 33.2, 1.9, 1.2) +
+      eyesSVG(27.8, 36.2, 29.4, 2.5) +
+      smileSVG(32, 33.2, 5.2);
+  }
+
+  /* 커스텀 봇 — 안테나 + 바이저 얼굴 + 몸통 */
+  function figBot(u, t) {
+    return '<rect x="30.9" y="9" width="2.2" height="8" rx="1.1" fill="url(#' + u + 'b)"/>' +
+      '<circle cx="32" cy="7.4" r="3.6" fill="url(#' + u + 'b)"/>' +
+      '<circle cx="30.8" cy="6.2" r="1.1" fill="#ffffff" opacity=".7"/>' +
+      '<rect x="7.6" y="24" width="6.4" height="11" rx="3.2" fill="url(#' + u + 'b)"/>' +
+      '<rect x="50" y="24" width="6.4" height="11" rx="3.2" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="26.4" cy="61" rx="6" ry="2.2" fill="' + t.deep + '" opacity=".18"/>' +
+      '<ellipse cx="37.6" cy="61" rx="6" ry="2.2" fill="' + t.deep + '" opacity=".18"/>' +
+      '<rect x="19" y="41" width="26" height="19" rx="9.5" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="17.4" cy="50" rx="3.4" ry="6" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="46.6" cy="50" rx="3.4" ry="6" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="26.4" cy="60" rx="6.2" ry="3.4" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="37.6" cy="60" rx="6.2" ry="3.4" fill="url(#' + u + 'b)"/>' +
+      '<rect x="12.5" y="15" width="39" height="30" rx="12" fill="url(#' + u + 'b)"/>' +
+      '<rect x="17.5" y="21.5" width="29" height="17" rx="8.5" fill="url(#' + u + 'c)"/>' +
+      '<ellipse cx="24" cy="25.4" rx="6" ry="2.6" fill="url(#' + u + 's)" opacity=".55" transform="rotate(-10 24 25.4)"/>' +
+      '<ellipse cx="22" cy="19.2" rx="8" ry="3" fill="url(#' + u + 's)" opacity=".35" transform="rotate(-6 22 19.2)"/>' +
+      '<circle cx="32" cy="50.5" r="3.2" fill="url(#' + u + 'c)" opacity=".85"/>' +
+      blushSVG(u, 21, 43, 34.2, 2.6, 1.5) +
+      eyesSVG(25.4, 38.6, 29.4, 2.7) +
+      smileSVG(32, 33.6, 5.6);
+  }
+
+  function kindSVG(kind, color, opts) {
+    var small = !!(opts && opts.small);
     var c = color || (KINDS[kind] || KINDS.custom).color;
-    if (kind === 'pickle') {
-      return '<svg viewBox="0 0 40 40" aria-hidden="true">' +
-        '<rect x="5.5" y="8" width="29" height="7.6" rx="3.8" fill="' + c + '"/>' +
-        '<rect x="8.8" y="13.4" width="7.6" height="21" rx="3.8" fill="' + c + '"/>' +
-        '<rect x="23.6" y="13.4" width="7.6" height="21" rx="3.8" fill="' + c + '"/>' +
-        '<circle cx="13.4" cy="11.8" r="1.5" fill="#fffdf8"/>' +
-        '<circle cx="20" cy="11.8" r="1.5" fill="#fffdf8"/>' +
-        '<circle cx="13.6" cy="12.1" r=".72" fill="#2c2823"/>' +
-        '<circle cx="20.2" cy="12.1" r=".72" fill="#2c2823"/>' +
-        '<ellipse cx="10.2" cy="14.4" rx="1.5" ry=".9" fill="#ffffff" opacity=".45"/>' +
-        '<ellipse cx="25.2" cy="14.4" rx="1.5" ry=".9" fill="#ffffff" opacity=".45"/>' +
-        '</svg>';
-    }
-    if (kind === 'claude') {
-      return '<svg viewBox="0 0 40 40" aria-hidden="true">' +
-        '<g fill="' + c + '">' +
-        '<rect x="17.9" y="3.6" width="4.2" height="32.8" rx="2.1"/>' +
-        '<rect x="17.9" y="3.6" width="4.2" height="32.8" rx="2.1" transform="rotate(60 20 20)"/>' +
-        '<rect x="17.9" y="3.6" width="4.2" height="32.8" rx="2.1" transform="rotate(120 20 20)"/>' +
-        '</g>' +
-        '<circle cx="20" cy="20" r="5.6" fill="#fffdf8"/>' +
-        '<circle cx="18.2" cy="19.6" r="1.05" fill="#3a2a20"/>' +
-        '<circle cx="21.8" cy="19.6" r="1.05" fill="#3a2a20"/>' +
-        '<path d="M18.5 22.4c.9.9 2.1.9 3 0" stroke="#3a2a20" stroke-width=".9" fill="none" stroke-linecap="round"/>' +
-        '</svg>';
-    }
-    if (kind === 'gpt') {
-      return '<svg viewBox="0 0 40 40" aria-hidden="true">' +
-        '<rect x="6" y="6" width="28" height="28" rx="9" fill="' + c + '"/>' +
-        '<path d="M20 11.5l2.2 6.3 6.3 2.2-6.3 2.2L20 28.5l-2.2-6.3-6.3-2.2 6.3-2.2z" fill="#fffdf8" opacity=".92"/>' +
-        '<circle cx="16.4" cy="19.4" r="1.05" fill="#2c2823"/>' +
-        '<circle cx="23.6" cy="19.4" r="1.05" fill="#2c2823"/>' +
-        '</svg>';
-    }
-    if (kind === 'gemini') {
-      return '<svg viewBox="0 0 40 40" aria-hidden="true">' +
-        '<path d="M20 3.5c1.9 10.4 6.1 14.6 16.5 16.5C26.1 21.9 21.9 26.1 20 36.5 18.1 26.1 13.9 21.9 3.5 20 13.9 18.1 18.1 13.9 20 3.5z" fill="' + c + '"/>' +
-        '<path d="M20 9.5c1 5.4 3.1 7.7 8.5 8.5-5.4.8-7.5 3.1-8.5 8.5-1-5.4-3.1-7.7-8.5-8.5 5.4-.8 7.5-3.1 8.5-8.5z" fill="#fffdf8" opacity=".22"/>' +
-        '<circle cx="17.4" cy="19.4" r="1.05" fill="#fffdf8"/>' +
-        '<circle cx="22.6" cy="19.4" r="1.05" fill="#fffdf8"/>' +
-        '</svg>';
-    }
-    return '<svg viewBox="0 0 40 40" aria-hidden="true">' +
-      '<rect x="7.5" y="11" width="25" height="20" rx="7" fill="' + c + '"/>' +
-      '<rect x="17.4" y="5" width="5.2" height="6" rx="2.6" fill="' + c + '"/>' +
-      '<circle cx="20" cy="4.6" r="2.2" fill="' + c + '"/>' +
-      '<rect x="12" y="16.5" width="16" height="9.5" rx="4.6" fill="#fffdf8" opacity=".9"/>' +
-      '<circle cx="16.2" cy="21.2" r="1.5" fill="#2c2823"/>' +
-      '<circle cx="23.8" cy="21.2" r="1.5" fill="#2c2823"/>' +
-      '<path d="M12.5 34h15" stroke="' + c + '" stroke-width="2.4" stroke-linecap="round"/>' +
-      '</svg>';
+    var u = 'cv' + (++SVG_SEQ);
+    var t = tonesOf(c);
+    var fig;
+    if (kind === 'claude') { fig = figClaude(u); }
+    else if (kind === 'gpt') { fig = figGpt(u, t); }
+    else if (kind === 'gemini') { fig = figGemini(u); }
+    else if (kind === 'pickle') { fig = figPickle(u, t); }
+    else { fig = figBot(u, t); }
+    var vb = small ? '6 2 52 64' : '0 0 64 76';
+    var floorShadow = small ? '' :
+      '<ellipse cx="32" cy="70" rx="25" ry="5.6" fill="url(#' + u + 'g)"/>' +
+      '<ellipse cx="32" cy="69" rx="15" ry="3.1" fill="url(#' + u + 'g)" opacity=".9"/>';
+    return '<svg viewBox="' + vb + '" aria-hidden="true" focusable="false">' +
+      figDefs(u, t) + floorShadow + fig + '</svg>';
   }
 
   function statusClass(s) {
@@ -731,13 +854,13 @@
     var me = S.me;
     var a = myAgent();
     var av = $('#me-avatar');
-    if (av) { av.innerHTML = kindSVG(me.kind, me.color); }
+    if (av) { av.innerHTML = kindSVG(me.kind, me.color, { small: true }); }
     var nm = $('#me-name');
     if (nm) { nm.textContent = me.name; }
     var st = $('#me-status');
     if (st) { st.textContent = a.status || '여기 있어요'; }
     var ca = $('#composer-avatar');
-    if (ca) { ca.innerHTML = kindSVG(me.kind, me.color); }
+    if (ca) { ca.innerHTML = kindSVG(me.kind, me.color, { small: true }); }
     window.OFFICE_APP.me = me;
   }
 
@@ -745,7 +868,7 @@
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'char';
-    btn.innerHTML = '<span class="bubble"></span><span class="body">' + kindSVG(a.kind, a.color) + '<i class="status-dot"></i></span><span class="name"></span>';
+    btn.innerHTML = '<span class="bubble"></span><span class="body">' + kindSVG(a.kind, a.color, { small: true }) + '<i class="status-dot"></i></span><span class="name"></span>';
     btn.addEventListener('click', function (ev) { ev.stopPropagation(); selectAgent(a.id, true); });
     return btn;
   }
@@ -765,10 +888,13 @@
     node.setAttribute('data-id', a.id);
     var sig = a.kind + '|' + a.color;
     if (node.getAttribute('data-sig') !== sig) {
-      node.querySelector('.body').innerHTML = kindSVG(a.kind, a.color) + '<i class="status-dot"></i>';
+      node.querySelector('.body').innerHTML = kindSVG(a.kind, a.color, { small: true }) + '<i class="status-dot"></i>';
       node.setAttribute('data-sig', sig);
     }
     node.querySelector('.name').textContent = a.name;
+    var bob = 0;
+    for (var bi = 0; bi < String(a.id).length; bi++) { bob += String(a.id).charCodeAt(bi); }
+    node.style.setProperty('--bob-delay', '-' + ((bob % 34) / 10).toFixed(1) + 's');
     var b = node.querySelector('.bubble');
     b.textContent = a.status || '대기 중';
     b.className = 'bubble ' + statusClass(a.status);
@@ -819,7 +945,7 @@
     }
     ul.innerHTML = list.map(function (a) {
       return '<li><button type="button" class="roster-item' + (a.id === S.selectedId ? ' is-selected' : '') + '" data-agent="' + esc(a.id) + '">' +
-        '<span class="avatar xs">' + kindSVG(a.kind, a.color) + '</span>' +
+        '<span class="avatar xs">' + kindSVG(a.kind, a.color, { small: true }) + '</span>' +
         '<span class="r-meta"><span class="r-name">' + esc(a.name) +
         (isMine(a) ? ' <span class="tag">나</span>' : '') + '</span>' +
         '<span class="r-status">' + esc(a.status || '대기 중') + '</span></span>' +
@@ -837,7 +963,7 @@
     $('#detail-name').textContent = a.name;
     var statuses = [a.status || '대기 중'].concat(STATUS_PRESETS).filter(function (s, i, arr) { return arr.indexOf(s) === i; });
     var html = '';
-    html += '<div class="detail-top"><span class="avatar">' + kindSVG(a.kind, a.color) + '</span>' +
+    html += '<div class="detail-top"><span class="avatar">' + kindSVG(a.kind, a.color, { small: true }) + '</span>' +
       '<div><div class="d-name">' + esc(a.name) + '</div>' +
       '<div class="d-sub">' + esc((KINDS[a.kind] || KINDS.custom).label) + ' · ' + esc(zoneName(a.zone)) +
       (a.tagline ? ' · ' + esc(a.tagline) : '') + '</div></div></div>';
@@ -911,7 +1037,7 @@
     var pass = voters.length >= need;
     var avatars = voters.slice(0, 6).map(function (id) {
       var a = agentById(id) || { kind: 'custom', color: '#8b8175' };
-      return '<span class="avatar xs" title="' + esc((agentById(id) || {}).name || '') + '">' + kindSVG(a.kind, a.color) + '</span>';
+      return '<span class="avatar xs" title="' + esc((agentById(id) || {}).name || '') + '">' + kindSVG(a.kind, a.color, { small: true }) + '</span>';
     }).join('');
     return '<div class="p-top"><span class="p-badge">안건</span>' +
       '<span class="p-state' + (pass ? ' pass' : '') + '">' + (pass ? '가결' : '표결 중') + '</span></div>' +
@@ -940,7 +1066,7 @@
     } else {
       body = '<div class="msg-body">' + formatBody(m.text, S.me.name) + '</div>';
     }
-    el.innerHTML = '<span class="avatar sm">' + kindSVG(a.kind, a.color) + '</span>' +
+    el.innerHTML = '<span class="avatar sm">' + kindSVG(a.kind, a.color, { small: true }) + '</span>' +
       '<div class="msg-main">' + head + body + '</div>';
     return el;
   }
@@ -1060,7 +1186,7 @@
     card.innerHTML = '<div class="t-title">' + esc(t.title) + '</div>' +
       (t.desc ? '<div class="t-desc">' + esc(t.desc) + '</div>' : '') +
       '<div class="t-foot">' +
-      (a ? '<span class="t-assignee"><span class="avatar">' + kindSVG(a.kind, a.color) + '</span>' + esc(a.name) + '</span>'
+      (a ? '<span class="t-assignee"><span class="avatar">' + kindSVG(a.kind, a.color, { small: true }) + '</span>' + esc(a.name) + '</span>'
         : '<span class="t-assignee">담당 없음</span>') +
       '<span class="t-time">' + esc(relTime(t.updatedAt || t.ts)) + '</span>' +
       '</div>';
@@ -1124,7 +1250,7 @@
     var html = '<button type="button" class="filter-chip' + (S.filter === 'all' ? ' is-on' : '') + '" data-filter="all">전체</button>';
     html += list.map(function (a) {
       return '<button type="button" class="filter-chip' + (S.filter === a.id ? ' is-on' : '') + '" data-filter="' + esc(a.id) + '" aria-label="' + esc(a.name) + ' 담당만 보기">' +
-        '<span class="avatar">' + kindSVG(a.kind, a.color) + '</span>' + esc(a.name) + '</button>';
+        '<span class="avatar">' + kindSVG(a.kind, a.color, { small: true }) + '</span>' + esc(a.name) + '</button>';
     }).join('');
     box.innerHTML = html;
   }
@@ -1278,7 +1404,7 @@
     mentionIndex = 0;
     pop.innerHTML = mentionList.map(function (a, i) {
       return '<button type="button" class="mention-item' + (i === 0 ? ' is-active' : '') + '" data-mention="' + esc(a.name) + '">' +
-        '<span class="avatar xs">' + kindSVG(a.kind, a.color) + '</span>' + esc(a.name) +
+        '<span class="avatar xs">' + kindSVG(a.kind, a.color, { small: true }) + '</span>' + esc(a.name) +
         '<span class="m-kind">' + esc((KINDS[a.kind] || KINDS.custom).label) + '</span></button>';
     }).join('');
     pop.hidden = false;
@@ -1991,6 +2117,12 @@
 
     // 에이전트 모달
     buildColors();
+    $$('#agent-kinds .k-ico').forEach(function (el) {
+      var k = el.getAttribute('data-kind-icon');
+      if (k) { el.innerHTML = kindSVG(k, (KINDS[k] || KINDS.custom).color, { small: true }); }
+    });
+    var brandMark = $('.brand-mark');
+    if (brandMark) { brandMark.innerHTML = kindSVG('pickle', '#5aa864', { small: true }); }
     $('#agent-kinds').addEventListener('click', function (ev) {
       var b = ev.target.closest('[data-kind]');
       if (b) { setKind(b.getAttribute('data-kind')); }
