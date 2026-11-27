@@ -55,8 +55,8 @@
       [30.5, 22.5], [79.5, 22.5]
     ],
     lounge: [
-      [75.5, 56], [75.5, 77], [83, 63], [83, 79],
-      [88.5, 60], [91, 70], [89, 80],
+      [74.6, 57], [74.6, 79], [89, 62], [90.5, 72], [87, 84],
+      [80, 68], [78.5, 86],
       [81.5, 36], [85.5, 36], [89.5, 36]
     ]
   };
@@ -418,11 +418,11 @@
     agent('ag-pickle', '피클', 'pickle', '#5aa864', '지휘 중', 'command', 50, 47.5, '사무실 실장');
     agent('ag-claude', '클로드', 'claude', '#cf7a4f', '집필 중', 'work', 49, 22.5, '문서·글쓰기 담당');
     agent('ag-gemini', '제미나이', 'gemini', '#6d8bf5', '자료 조사', 'work', 36.5, 22.5, '조사·요약 담당');
-    agent('ag-gpt', 'GPT', 'gpt', '#5fb98f', '대기 중', 'lounge', 83, 63, '아이디어 파트너');
+    agent('ag-gpt', 'GPT', 'gpt', '#5fb98f', '대기 중', 'lounge', 80, 68, '아이디어 파트너');
     agent('ag-pickle2', '피클 β', 'pickle', '#8fbf6f', '회의 중', 'meeting', 8.6, 42.4, '일정·정리 담당');
     agent('ag-maker', '메이커봇', 'custom', '#e0a83c', '작업 중', 'work', 61.5, 70, '자동화·빌드 담당');
     agent('ag-scribe', '서기봇', 'custom', '#8a7fd0', '기록 중', 'meeting', 19.8, 50.2, '회의록 담당');
-    agent('ag-barista', '바리스타', 'gpt', '#c9a227', '사색 중', 'lounge', 81.5, 36, '라운지 담당');
+    agent('ag-barista', '바리스타', 'gpt', '#c9a227', '사색 중', 'lounge', 85.5, 36, '라운지 담당');
 
     var messages = {};
     function msg(id, agentId, kind, text, minutesAgo, room) {
