@@ -269,12 +269,13 @@
   }
   /* 네 갈래 반짝이 */
   function sparkleSVG(cx, cy, r, fill, op) {
-    var w = (r * 0.24).toFixed(2);
-    return '<path d="M' + cx + ' ' + (cy - r) +
-      'Q' + (cx + w) + ' ' + (cy - w) + ' ' + (cx + r) + ' ' + cy +
-      'Q' + (cx + w) + ' ' + (cy + w) + ' ' + cx + ' ' + (cy + r) +
-      'Q' + (cx - w) + ' ' + (cy + w) + ' ' + (cx - r) + ' ' + cy +
-      'Q' + (cx - w) + ' ' + (cy - w) + ' ' + cx + ' ' + (cy - r) + 'Z"' +
+    function p(n) { return Math.round(n * 100) / 100; }
+    var w = r * 0.24;
+    return '<path d="M' + p(cx) + ' ' + p(cy - r) +
+      'Q' + p(cx + w) + ' ' + p(cy - w) + ' ' + p(cx + r) + ' ' + p(cy) +
+      'Q' + p(cx + w) + ' ' + p(cy + w) + ' ' + p(cx) + ' ' + p(cy + r) +
+      'Q' + p(cx - w) + ' ' + p(cy + w) + ' ' + p(cx - r) + ' ' + p(cy) +
+      'Q' + p(cx - w) + ' ' + p(cy - w) + ' ' + p(cx) + ' ' + p(cy - r) + 'Z"' +
       ' fill="' + fill + '" opacity="' + op + '"/>';
   }
 
@@ -285,19 +286,17 @@
 
   /* 몸 뒤쪽 — 짧은 발 두 개 */
   function feetSVG(u, t) {
-    return '<ellipse cx="25.4" cy="61.4" rx="6.6" ry="3.9" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="38.6" cy="61.4" rx="6.6" ry="3.9" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="32" cy="64.6" rx="13" ry="2.6" fill="' + t.deep + '" opacity=".16"/>';
+    return '<ellipse cx="25.2" cy="61.6" rx="5.6" ry="3.4" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="38.8" cy="61.6" rx="5.6" ry="3.4" fill="url(#' + u + 'b)"/>';
   }
   /* 머리 꼭대기의 동글동글한 꼭지 */
   function nubSVG(u) {
-    return '<ellipse cx="32" cy="11.4" rx="3" ry="4.6" fill="url(#' + u + 'b)"/>';
+    return '<ellipse cx="32" cy="12.4" rx="3.4" ry="3.4" fill="url(#' + u + 'b)"/>';
   }
   /* 피클 — ㅍ 모양 왕관 (가로대 + 두 다리) */
   function crownSVG(u) {
-    return '<rect x="25.2" y="4.4" width="5.4" height="12" rx="2.7" fill="url(#' + u + 'b)"/>' +
-      '<rect x="33.4" y="4.4" width="5.4" height="12" rx="2.7" fill="url(#' + u + 'b)"/>' +
-      '<rect x="23.4" y="6.2" width="17.2" height="5.4" rx="2.7" fill="url(#' + u + 'b)"/>';
+    return '<ellipse cx="28.3" cy="12.4" rx="3.1" ry="4.8" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="35.7" cy="12.4" rx="3.1" ry="4.8" fill="url(#' + u + 'b)"/>';
   }
   /* 봇 — 가느다란 안테나 */
   function antennaSVG(u) {
@@ -319,9 +318,9 @@
   function mochiSVG(u, t, back, front) {
     return (back || '') +
       '<path d="' + MOCHI + '" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="23.4" cy="23" rx="9" ry="6" fill="url(#' + u + 's)" opacity=".82" transform="rotate(-30 23.4 23)"/>' +
-      '<ellipse cx="20.4" cy="20.2" rx="2.6" ry="1.8" fill="#ffffff" opacity=".72" transform="rotate(-30 20.4 20.2)"/>' +
-      '<ellipse cx="32" cy="56.2" rx="12.4" ry="4.4" fill="#ffffff" opacity=".14"/>' +
+      '<ellipse cx="23.4" cy="23.4" rx="10.4" ry="7" fill="url(#' + u + 's)" opacity=".5" transform="rotate(-32 23.4 23.4)"/>' +
+      '<ellipse cx="20.6" cy="20.4" rx="2.4" ry="1.6" fill="#ffffff" opacity=".6" transform="rotate(-32 20.6 20.4)"/>' +
+      '<ellipse cx="32" cy="56.4" rx="11.6" ry="3.8" fill="#ffffff" opacity=".1"/>' +
       (front || '') +
       blushSVG(u, 19.4, 44.6, 40.4, 4.2, 2.5) +
       eyesSVG(25.4, 38.6, 33.2, 3.5) +
