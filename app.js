@@ -1007,7 +1007,7 @@
         '<span class="a-top">' + esc(a.name) + ' · ' + esc(relTime(m.ts)) +
         '<span class="a-state' + (pass ? ' pass' : '') + '">' + (pass ? '가결' : '표결 중') + '</span></span>' +
         '<span class="a-text">' + esc(m.text) + '</span>' +
-        '<span class="a-top">찬성 ' + n + ' / ' + VOTE_NEEDED + '</span>' +
+        '<span class="a-top">찬성 ' + n + '표' + (pass ? ' · 가결' : ' · ' + VOTE_NEEDED + '표 필요') + '</span>' +
         '</button>';
     }).join('');
   }
@@ -2071,7 +2071,10 @@
     $('#agent-zone').value = 'lounge';
     bind();
 
-    var savedView = storeGet(KEY.view) || (location.hash || '').replace('#', '') || 'map';
+    var hashView = (location.hash || '').replace('#', '');
+    var savedView = ['map', 'meeting', 'workroom'].indexOf(hashView) >= 0
+      ? hashView
+      : (storeGet(KEY.view) || 'map');
     setView(savedView, true);
 
     // 첫 렌더 (데이터 도착 전에도 내 캐릭터가 보이도록)
