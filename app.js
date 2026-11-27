@@ -228,6 +228,32 @@
     return null;
   }
 
+  function nearestAgentDist(p) {
+    var min = 1e9;
+    Object.keys(S.data.agents || {}).forEach(function (k) {
+      var a = S.data.agents[k];
+      if (!a || !a.pos || typeof a.pos.x !== 'number') { return; }
+      if (S.me && a.id === S.me.id) { return; }
+      var dx = a.pos.x - p.x;
+      var dy = (a.pos.y - p.y) * 1.7;
+      var d = Math.sqrt(dx * dx + dy * dy);
+      if (d < min) { min = d; }
+    });
+    return min;
+  }
+
+  function spawnPos(zoneId) {
+    var best = randomPos(zoneId);
+    var bestD = nearestAgentDist(best);
+    for (var i = 0; i < 14; i++) {
+      var p = randomPos(zoneId);
+      var d = nearestAgentDist(p);
+      if (d > 17) { return p; }
+      if (d > bestD) { bestD = d; best = p; }
+    }
+    return best;
+  }
+
   function randomPos(zoneId) {
     var z = ZONES[zoneId] || ZONES.lounge;
     return {
@@ -812,7 +838,7 @@
   function zoneSet(id, zoneId) {
     var a = agentById(id);
     if (!a) { return; }
-    var p = randomPos(zoneId);
+    var p = spawnPos(zoneId);
     S.db.patch('agents/' + id, { zone: zoneId, pos: p, updatedAt: Date.now() });
     if (isMine(a)) { S.me.zone = zoneId; storeSet(KEY.me, JSON.stringify(S.me)); }
     toast(a.name + ' → ' + zoneName(zoneId));
@@ -1057,7 +1083,7 @@
     var list = agentsList();
     var html = '<button type="button" class="filter-chip' + (S.filter === 'all' ? ' is-on' : '') + '" data-filter="all">전체</button>';
     html += list.map(function (a) {
-      return '<button type="button" class="filter-chip' + (S.filter === a.id ? ' is-on' : '') + '" data-filter="' + esc(a.id) + '">' +
+      return '<button type="button" class="filter-chip' + (S.filter === a.id ? ' is-on' : '') + '" data-filter="' + esc(a.id) + '" aria-label="' + esc(a.name) + ' 담당만 보기">' +
         '<span class="avatar">' + kindSVG(a.kind, a.color) + '</span>' + esc(a.name) + '</button>';
     }).join('');
     box.innerHTML = html;
@@ -1495,7 +1521,7 @@
     if (S.agentEditId) {
       var a = agentById(S.agentEditId);
       var patch = { name: name, kind: pickedKind, color: pickedColor, status: status, updatedAt: Date.now() };
-      if (a && a.zone !== zone) { patch.zone = zone; patch.pos = randomPos(zone); }
+      if (a && a.zone !== zone) { patch.zone = zone; patch.pos = spawnPos(zone); }
       S.db.patch('agents/' + S.agentEditId, patch);
       if (isMine(a)) {
         S.me.name = name; S.me.kind = pickedKind; S.me.color = pickedColor; S.me.status = status;
@@ -1505,7 +1531,7 @@
       toast('캐릭터를 저장했어요');
     } else {
       var id = uid('ag');
-      var p = randomPos(zone);
+      var p = spawnPos(zone);
       S.db.set('agents/' + id, {
         id: id, name: name, kind: pickedKind, color: pickedColor, status: status,
         zone: zone, pos: p, tagline: '초대된 에이전트', createdBy: S.me.id,
@@ -1604,7 +1630,7 @@
   function ensureMe() {
     var a = S.data.agents[S.me.id];
     if (!a) {
-      var p = randomPos(S.me.zone || 'lounge');
+      var p = spawnPos(S.me.zone || 'lounge');
       var obj = {
         id: S.me.id, name: S.me.name, kind: S.me.kind, color: S.me.color,
         status: S.me.status || '여기 있어요', zone: S.me.zone || 'lounge', pos: p,
