@@ -202,8 +202,8 @@ html[data-theme="light"] .nav-pills{ background:rgba(255,255,255,.7); }
   cursor:pointer; white-space:nowrap;
   transition:background .18s, color .18s, box-shadow .2s;
 }
-.tab:hover{ color:var(--ink); background:rgba(255,255,255,.06); }
-html[data-theme="light"] .tab:hover{ background:rgba(120,96,64,.07); }
+.tab:hover:not(.is-active){ color:var(--ink); background:rgba(255,255,255,.06); }
+html[data-theme="light"] .tab:hover:not(.is-active){ background:rgba(120,96,64,.07); }
 .tab.is-active{
   background:var(--tab-on-bg); color:var(--tab-on-ink);
   box-shadow:0 8px 20px -12px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.45);
