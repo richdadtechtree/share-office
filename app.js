@@ -248,7 +248,7 @@
     for (var i = 0; i < 14; i++) {
       var p = randomPos(zoneId);
       var d = nearestAgentDist(p);
-      if (d > 17) { return p; }
+      if (d > 22) { return p; }
       if (d > bestD) { bestD = d; best = p; }
     }
     return best;
@@ -344,7 +344,7 @@
   function spreadPosIn(data, zoneId, selfId) {
     var best = randomPos(zoneId);
     var bestD = -1;
-    for (var i = 0; i < 8; i++) {
+    for (var i = 0; i < 12; i++) {
       var p = randomPos(zoneId);
       var min = 1e9;
       Object.keys(data.agents || {}).forEach(function (k) {
@@ -356,7 +356,7 @@
         if (d < min) { min = d; }
       });
       if (min > bestD) { bestD = min; best = p; }
-      if (min > 20) { break; }
+      if (min > 26) { break; }
     }
     return best;
   }
