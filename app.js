@@ -280,12 +280,12 @@
 
   /* 제미나이 — 네 갈래 반짝이 + 작은 얼굴 */
   function figGemini(u) {
-    return '<path d="M32 8.5C33.4 24.2 37.8 28.6 53.5 30 37.8 31.4 33.4 35.8 32 51.5 30.6 35.8 26.2 31.4 10.5 30 26.2 28.6 30.6 24.2 32 8.5Z" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="30" cy="16.6" rx="2.3" ry="5" fill="url(#' + u + 's)" opacity=".4" transform="rotate(-6 30 16.6)"/>' +
-      '<path d="M49 41.5c.4 2.4 1.3 3.3 3.7 3.7-2.4.4-3.3 1.3-3.7 3.7-.4-2.4-1.3-3.3-3.7-3.7 2.4-.4 3.3-1.3 3.7-3.7z" fill="#ffffff" opacity=".5"/>' +
-      blushSVG(u, 24.6, 39.4, 33.2, 1.9, 1.2) +
-      eyesSVG(27.8, 36.2, 29.4, 2.5) +
-      smileSVG(32, 33.2, 5.2);
+    return '<path d="M32 6C33 24 40 31 58 32 40 33 33 40 32 58 31 40 24 33 6 32 24 31 31 24 32 6Z" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="29.6" cy="14.6" rx="2.6" ry="5.4" fill="url(#' + u + 's)" opacity=".45" transform="rotate(-8 29.6 14.6)"/>' +
+      '<path d="M52 44.5c.5 2.8 1.5 3.8 4.3 4.3-2.8.5-3.8 1.5-4.3 4.3-.5-2.8-1.5-3.8-4.3-4.3 2.8-.5 3.8-1.5 4.3-4.3z" fill="#ffffff" opacity=".45"/>' +
+      blushSVG(u, 23.4, 40.6, 36, 2.2, 1.4) +
+      eyesSVG(27, 37, 31, 3) +
+      smileSVG(32, 35.4, 6.2);
   }
 
   /* 커스텀 봇 — 안테나 + 바이저 얼굴 + 몸통 */
@@ -302,6 +302,7 @@
       '<ellipse cx="46.6" cy="50" rx="3.4" ry="6" fill="url(#' + u + 'b)"/>' +
       '<ellipse cx="26.4" cy="60" rx="6.2" ry="3.4" fill="url(#' + u + 'b)"/>' +
       '<ellipse cx="37.6" cy="60" rx="6.2" ry="3.4" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="32" cy="45.6" rx="12.4" ry="2.6" fill="' + t.deep + '" opacity=".22"/>' +
       '<rect x="12.5" y="15" width="39" height="30" rx="12" fill="url(#' + u + 'b)"/>' +
       '<rect x="17.5" y="21.5" width="29" height="17" rx="8.5" fill="url(#' + u + 'c)"/>' +
       '<ellipse cx="24" cy="25.4" rx="6" ry="2.6" fill="url(#' + u + 's)" opacity=".55" transform="rotate(-10 24 25.4)"/>' +
