@@ -85,7 +85,7 @@ kbd{ border:1px solid var(--line); border-bottom-width:2px; border-radius:6px; p
   box-shadow:var(--shadow-sm), inset 0 1px 0 #fff;
 }
 .brand-mark svg{ height:34px; width:auto; }
-.brand-text h1{ font-size:20px; letter-spacing:-.02em; font-weight:800; }
+.brand-text h1{ font-size:20px; letter-spacing:-.02em; font-weight:800; white-space:nowrap; }
 .brand-text p{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-top:1px; }
 .top-actions{ display:flex; align-items:center; gap:8px; }
 
@@ -733,7 +733,7 @@ main{ position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:8px
   .top{ padding-top:16px; gap:8px; }
   .brand-mark{ width:40px; height:40px; border-radius:13px; }
   .brand-mark svg{ width:26px; height:26px; }
-  .brand-text h1{ font-size:18px; }
+  .brand-text h1{ font-size:17px; white-space:nowrap; }
   .brand-text p{ font-size:9.5px; letter-spacing:.12em; }
   .only-wide{ display:none; }
   .conn-pill{ padding:6px 10px; font-size:11.5px; }
