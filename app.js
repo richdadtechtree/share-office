@@ -62,14 +62,14 @@
   };
 
   var KINDS = {
-    pickle: { label: '피클', tag: 'PICKLE', color: '#5aa864', status: '작업 중', badge: '💚' },
-    claude: { label: '클로드', tag: 'CLAUDE', color: '#cf7a4f', status: '생각 중', badge: '🧡' },
-    gpt:    { label: 'GPT', tag: 'GPT', color: '#5fb98f', status: '대기 중', badge: '🤍' },
-    gemini: { label: '제미나이', tag: 'GEMINI', color: '#6d8bf5', status: '자료 조사', badge: '💙' },
-    custom: { label: '커스텀 봇', tag: 'BOT', color: '#e0a83c', status: '대기 중', badge: '💛' }
+    pickle: { label: '피클', tag: 'PICKLE', color: '#7cc48a', status: '작업 중', badge: '💚' },
+    claude: { label: '클로드', tag: 'CLAUDE', color: '#eb9370', status: '생각 중', badge: '🧡' },
+    gpt:    { label: 'GPT', tag: 'GPT', color: '#68bfb0', status: '대기 중', badge: '🤍' },
+    gemini: { label: '제미나이', tag: 'GEMINI', color: '#9a92ee', status: '자료 조사', badge: '💙' },
+    custom: { label: '커스텀 봇', tag: 'BOT', color: '#eec257', status: '대기 중', badge: '💛' }
   };
 
-  var PALETTE = ['#5aa864', '#8fbf6f', '#4fa9a3', '#6d8bf5', '#8a7fd0', '#c77fb0', '#cf7a4f', '#e0a83c', '#c9a227', '#8b8175'];
+  var PALETTE = ['#7cc48a', '#a8d682', '#68bfb0', '#9a92ee', '#b09ae8', '#e79ac0', '#eb9370', '#eec257', '#d9a86b', '#a9a196'];
   var STATUS_PRESETS = ['작업 중', '생각 중', '회의 중', '자료 조사', '집필 중', '대기 중', '자리 비움'];
   var TASK_STATUS = { todo: '할 일', doing: '진행 중', done: '완료' };
   var VOTE_NEEDED = 3;
@@ -188,16 +188,19 @@
   }
 
   /* ══════════════════════ 2. 캐릭터 SVG ══════════════════════
-     입체(클레이 · 비닐 토이) 캐릭터.
+     통통한 젤리·모찌 마스코트.
+     모두 같은 둥근 몸(위는 좁고 아래는 넓은 달걀형)을 쓰고,
+     색깔과 아주 작은 장식(피클 ㅍ 왕관 · 클로드 꽃점 · 제미나이 반짝이 ·
+     봇 안테나)으로만 서로를 구분합니다. 눈은 크고 동그랗게, 볼은 발그레하게.
      빛은 언제나 왼쪽 위에서 오도록 gradientUnits="userSpaceOnUse"로 칠해
-     여러 조각이 하나의 찰흙 덩어리처럼 이어져 보이게 합니다. */
+     여러 조각이 하나의 젤리 덩어리처럼 이어져 보이게 합니다. */
 
   var SVG_SEQ = 0;
 
   function rgbOf(hex) {
     var h = String(hex === null || hex === undefined ? '' : hex).replace('#', '');
     if (h.length === 3) { h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2]; }
-    if (!/^[0-9a-fA-F]{6}$/.test(h)) { h = '5aa864'; }
+    if (!/^[0-9a-fA-F]{6}$/.test(h)) { h = '7cc48a'; }
     var n = parseInt(h, 16);
     return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
   }
@@ -208,145 +211,121 @@
     var b = Math.round(a.b + (to[2] - a.b) * amt);
     return '#' + ('00000' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16)).slice(-6);
   }
+  /* 젤리라서 그림자는 부드럽고, 밝은 곳은 거의 흰색까지 갑니다. */
   function tonesOf(c) {
     return {
-      hi: mixHex(c, [255, 255, 255], 0.8),
-      light: mixHex(c, [255, 255, 255], 0.45),
-      base: mixHex(c, [255, 255, 255], 0),
-      dark: mixHex(c, [38, 29, 22], 0.3),
-      deep: mixHex(c, [30, 22, 16], 0.55)
+      hi: mixHex(c, [255, 255, 255], 0.72),
+      light: mixHex(c, [255, 255, 255], 0.4),
+      base: mixHex(c, [255, 255, 255], 0.04),
+      dark: mixHex(c, [40, 30, 24], 0.24),
+      deep: mixHex(c, [32, 24, 18], 0.46)
     };
   }
+
   function figDefs(u, t) {
     return '<defs>' +
-      '<linearGradient id="' + u + 'b" gradientUnits="userSpaceOnUse" x1="15" y1="5" x2="47" y2="74">' +
+      '<linearGradient id="' + u + 'b" gradientUnits="userSpaceOnUse" x1="20" y1="8" x2="45" y2="66">' +
         '<stop offset="0" stop-color="' + t.hi + '"/>' +
-        '<stop offset=".24" stop-color="' + t.light + '"/>' +
-        '<stop offset=".58" stop-color="' + t.base + '"/>' +
-        '<stop offset="1" stop-color="' + t.dark + '"/>' +
+        '<stop offset=".25" stop-color="' + t.light + '"/>' +
+        '<stop offset=".62" stop-color="' + t.base + '"/>' +
+        '<stop offset=".88" stop-color="' + t.dark + '"/>' +
+        '<stop offset="1" stop-color="' + t.deep + '"/>' +
       '</linearGradient>' +
-      '<radialGradient id="' + u + 'c" gradientUnits="userSpaceOnUse" cx="26" cy="24" r="27">' +
-        '<stop offset="0" stop-color="#fffefb"/>' +
-        '<stop offset=".52" stop-color="#f8eedf"/>' +
-        '<stop offset="1" stop-color="#ddceb3"/>' +
-      '</radialGradient>' +
       '<radialGradient id="' + u + 's" cx="50%" cy="50%" r="50%">' +
-        '<stop offset="0" stop-color="#ffffff" stop-opacity=".92"/>' +
-        '<stop offset=".55" stop-color="#ffffff" stop-opacity=".3"/>' +
+        '<stop offset="0" stop-color="#ffffff" stop-opacity=".95"/>' +
+        '<stop offset=".55" stop-color="#ffffff" stop-opacity=".32"/>' +
         '<stop offset="1" stop-color="#ffffff" stop-opacity="0"/>' +
       '</radialGradient>' +
       '<radialGradient id="' + u + 'g" cx="50%" cy="50%" r="50%">' +
-        '<stop offset="0" stop-color="' + t.deep + '" stop-opacity=".42"/>' +
-        '<stop offset=".5" stop-color="' + t.deep + '" stop-opacity=".17"/>' +
+        '<stop offset="0" stop-color="' + t.deep + '" stop-opacity=".5"/>' +
+        '<stop offset=".5" stop-color="' + t.deep + '" stop-opacity=".2"/>' +
         '<stop offset="1" stop-color="' + t.deep + '" stop-opacity="0"/>' +
       '</radialGradient>' +
       '<radialGradient id="' + u + 'k" cx="50%" cy="50%" r="50%">' +
-        '<stop offset="0" stop-color="#ef8b90" stop-opacity=".6"/>' +
-        '<stop offset=".65" stop-color="#ef8b90" stop-opacity=".22"/>' +
-        '<stop offset="1" stop-color="#ef8b90" stop-opacity="0"/>' +
+        '<stop offset="0" stop-color="#ef7f86" stop-opacity=".55"/>' +
+        '<stop offset=".62" stop-color="#ef7f86" stop-opacity=".2"/>' +
+        '<stop offset="1" stop-color="#ef7f86" stop-opacity="0"/>' +
       '</radialGradient>' +
     '</defs>';
   }
 
-  /* 얼굴 조각 */
+  /* 얼굴 조각 — 흰 눈알 + 동그란 눈동자 + 반짝이는 점 */
   function eyesSVG(x1, x2, y, r) {
     function one(x) {
-      return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#3b3029"/>' +
-        '<circle cx="' + (x - r * 0.34).toFixed(2) + '" cy="' + (y - r * 0.42).toFixed(2) + '" r="' + (r * 0.4).toFixed(2) + '" fill="#ffffff" opacity=".95"/>' +
-        '<circle cx="' + (x + r * 0.34).toFixed(2) + '" cy="' + (y + r * 0.34).toFixed(2) + '" r="' + (r * 0.17).toFixed(2) + '" fill="#ffffff" opacity=".6"/>';
+      return '<ellipse cx="' + x + '" cy="' + y + '" rx="' + r + '" ry="' + (r * 1.1).toFixed(2) + '" fill="#fffcf5"/>' +
+        '<circle cx="' + x + '" cy="' + (y + r * 0.12).toFixed(2) + '" r="' + (r * 0.66).toFixed(2) + '" fill="#3b3129"/>' +
+        '<circle cx="' + (x - r * 0.3).toFixed(2) + '" cy="' + (y - r * 0.3).toFixed(2) + '" r="' + (r * 0.24).toFixed(2) + '" fill="#ffffff"/>' +
+        '<circle cx="' + (x + r * 0.34).toFixed(2) + '" cy="' + (y + r * 0.42).toFixed(2) + '" r="' + (r * 0.12).toFixed(2) + '" fill="#ffffff" opacity=".7"/>';
     }
     return one(x1) + one(x2);
   }
   function smileSVG(cx, y, w) {
-    return '<path d="M' + (cx - w / 2) + ' ' + y + 'q' + (w / 2) + ' ' + (w * 0.44) + ' ' + w + ' 0"' +
-      ' stroke="#57392b" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-opacity=".9"/>';
+    return '<path d="M' + (cx - w / 2) + ' ' + y + 'q' + (w / 2) + ' ' + (w * 0.52) + ' ' + w + ' 0"' +
+      ' stroke="#5b4030" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-opacity=".82"/>';
   }
   function blushSVG(u, x1, x2, y, rx, ry) {
     return '<ellipse cx="' + x1 + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="url(#' + u + 'k)"/>' +
       '<ellipse cx="' + x2 + '" cy="' + y + '" rx="' + rx + '" ry="' + ry + '" fill="url(#' + u + 'k)"/>';
   }
-
-  /* ㅍ 모양 피클 크리터 — 머리 막대 + 두 다리 + 앞발 */
-  function figPickle(u, t) {
-    return '<rect x="13.2" y="23" width="14.4" height="41" rx="7.2" fill="url(#' + u + 'b)"/>' +
-      '<rect x="36.4" y="23" width="14.4" height="41" rx="7.2" fill="url(#' + u + 'b)"/>' +
-      '<circle cx="13.6" cy="45" r="4.3" fill="url(#' + u + 'b)"/>' +
-      '<circle cx="50.4" cy="45" r="4.3" fill="url(#' + u + 'b)"/>' +
-      '<rect x="6.5" y="8.5" width="51" height="25" rx="12" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="20.4" cy="62.6" rx="7.5" ry="3.2" fill="' + t.deep + '" opacity=".2"/>' +
-      '<ellipse cx="43.6" cy="62.6" rx="7.5" ry="3.2" fill="' + t.deep + '" opacity=".2"/>' +
-      '<ellipse cx="18.6" cy="42" rx="3.1" ry="11.5" fill="url(#' + u + 's)" opacity=".34"/>' +
-      '<ellipse cx="41.8" cy="42" rx="3.1" ry="11.5" fill="url(#' + u + 's)" opacity=".34"/>' +
-      '<ellipse cx="20.6" cy="14.6" rx="11" ry="4.3" fill="url(#' + u + 's)" opacity=".55" transform="rotate(-6 20.6 14.6)"/>' +
-      blushSVG(u, 14.8, 49.2, 27.8, 3.5, 2.2) +
-      eyesSVG(22.8, 41.2, 21.4, 4.6) +
-      smileSVG(32, 27.8, 7.2);
+  /* 네 갈래 반짝이 */
+  function sparkleSVG(cx, cy, r, fill, op) {
+    var w = (r * 0.24).toFixed(2);
+    return '<path d="M' + cx + ' ' + (cy - r) +
+      'Q' + (cx + w) + ' ' + (cy - w) + ' ' + (cx + r) + ' ' + cy +
+      'Q' + (cx + w) + ' ' + (cy + w) + ' ' + cx + ' ' + (cy + r) +
+      'Q' + (cx - w) + ' ' + (cy + w) + ' ' + (cx - r) + ' ' + cy +
+      'Q' + (cx - w) + ' ' + (cy - w) + ' ' + cx + ' ' + (cy - r) + 'Z"' +
+      ' fill="' + fill + '" opacity="' + op + '"/>';
   }
 
-  /* 클로드 — 여섯 갈래 별 인형 + 크림색 얼굴 */
-  function figClaude(u) {
-    var spokes = '';
-    [0, 60, 120].forEach(function (a) {
-      spokes += '<rect x="27.3" y="14.5" width="9.4" height="44" rx="4.7" fill="url(#' + u + 'b)"' +
-        (a ? ' transform="rotate(' + a + ' 32 36.5)"' : '') + '/>';
-    });
-    return spokes +
-      '<ellipse cx="32" cy="18.6" rx="3" ry="4.4" fill="url(#' + u + 's)" opacity=".32"/>' +
-      '<circle cx="32" cy="36.5" r="12.8" fill="url(#' + u + 'c)"/>' +
-      '<circle cx="32" cy="36.5" r="12.8" fill="none" stroke="#ffffff" stroke-opacity=".45" stroke-width="1"/>' +
-      '<ellipse cx="27.6" cy="30.6" rx="6.2" ry="4.4" fill="url(#' + u + 's)" opacity=".6" transform="rotate(-25 27.6 30.6)"/>' +
-      blushSVG(u, 24.6, 39.4, 39.4, 1.9, 1.2) +
-      eyesSVG(28.6, 35.4, 36, 2.7) +
-      smileSVG(32, 39.8, 5.4);
+  /* 몸통 — 아래가 넓고 위가 좁은 통통한 모찌 */
+  var MOCHI = 'M32 12.6C39.4 12.6 46.6 16.8 50.2 24C53 29.8 53.6 36.4 53.4 42.2' +
+    'C53 52.6 45.4 61.6 32 61.6C18.6 61.6 11 52.6 10.6 42.2' +
+    'C10.4 36.4 11 29.8 13.8 24C17.4 16.8 24.6 12.6 32 12.6Z';
+
+  /* 몸 뒤쪽 — 짧은 발 두 개 */
+  function feetSVG(u, t) {
+    return '<ellipse cx="25.4" cy="61.4" rx="6.6" ry="3.9" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="38.6" cy="61.4" rx="6.6" ry="3.9" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="32" cy="64.6" rx="13" ry="2.6" fill="' + t.deep + '" opacity=".16"/>';
+  }
+  /* 머리 꼭대기의 동글동글한 꼭지 */
+  function nubSVG(u) {
+    return '<ellipse cx="32" cy="11.4" rx="3" ry="4.6" fill="url(#' + u + 'b)"/>';
+  }
+  /* 피클 — ㅍ 모양 왕관 (가로대 + 두 다리) */
+  function crownSVG(u) {
+    return '<rect x="25.2" y="4.4" width="5.4" height="12" rx="2.7" fill="url(#' + u + 'b)"/>' +
+      '<rect x="33.4" y="4.4" width="5.4" height="12" rx="2.7" fill="url(#' + u + 'b)"/>' +
+      '<rect x="23.4" y="6.2" width="17.2" height="5.4" rx="2.7" fill="url(#' + u + 'b)"/>';
+  }
+  /* 봇 — 가느다란 안테나 */
+  function antennaSVG(u) {
+    return '<rect x="30.9" y="3.6" width="2.2" height="11" rx="1.1" fill="url(#' + u + 'b)"/>' +
+      '<circle cx="32" cy="3.8" r="3.2" fill="url(#' + u + 'b)"/>' +
+      '<circle cx="30.9" cy="2.6" r="1" fill="#ffffff" opacity=".8"/>';
+  }
+  /* 클로드 — 어깨 옆에 아주 작은 꽃점 */
+  function flowerSVG() {
+    var cx = 49, cy = 18.4, d = 2.9;
+    return '<circle cx="' + cx + '" cy="' + (cy - d) + '" r="2.2" fill="#fff8ec" opacity=".8"/>' +
+      '<circle cx="' + (cx + d) + '" cy="' + cy + '" r="2.2" fill="#fff8ec" opacity=".8"/>' +
+      '<circle cx="' + cx + '" cy="' + (cy + d) + '" r="2.2" fill="#fff8ec" opacity=".8"/>' +
+      '<circle cx="' + (cx - d) + '" cy="' + cy + '" r="2.2" fill="#fff8ec" opacity=".8"/>' +
+      '<circle cx="' + cx + '" cy="' + cy + '" r="1.7" fill="#ffffff" opacity=".92"/>';
   }
 
-  /* GPT — 둥근 마시멜로 몸 + 짧은 발 */
-  function figGpt(u, t) {
-    return '<ellipse cx="23.5" cy="58.6" rx="7.6" ry="4.4" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="40.5" cy="58.6" rx="7.6" ry="4.4" fill="url(#' + u + 'b)"/>' +
-      '<rect x="10.5" y="15" width="43" height="43" rx="16.5" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="23.4" cy="61.4" rx="6.8" ry="2.2" fill="' + t.deep + '" opacity=".18"/>' +
-      '<ellipse cx="40.6" cy="61.4" rx="6.8" ry="2.2" fill="' + t.deep + '" opacity=".18"/>' +
-      '<ellipse cx="21.8" cy="23.6" rx="10.5" ry="6" fill="url(#' + u + 's)" opacity=".5" transform="rotate(-18 21.8 23.6)"/>' +
-      '<path d="M46 18.4c.5 3 1.6 4.1 4.6 4.6-3 .5-4.1 1.6-4.6 4.6-.5-3-1.6-4.1-4.6-4.6 3-.5 4.1-1.6 4.6-4.6z" fill="#ffffff" opacity=".42"/>' +
-      blushSVG(u, 15.8, 48.2, 41.6, 3.3, 2.1) +
-      eyesSVG(24.6, 39.4, 34.6, 4.7) +
-      smileSVG(32, 41.8, 7.4);
-  }
-
-  /* 제미나이 — 네 갈래 반짝이 + 작은 얼굴 */
-  function figGemini(u) {
-    return '<path d="M32 6C33 24 40 31 58 32 40 33 33 40 32 58 31 40 24 33 6 32 24 31 31 24 32 6Z" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="29.6" cy="14.6" rx="2.6" ry="5.4" fill="url(#' + u + 's)" opacity=".45" transform="rotate(-8 29.6 14.6)"/>' +
-      '<path d="M52 44.5c.5 2.8 1.5 3.8 4.3 4.3-2.8.5-3.8 1.5-4.3 4.3-.5-2.8-1.5-3.8-4.3-4.3 2.8-.5 3.8-1.5 4.3-4.3z" fill="#ffffff" opacity=".45"/>' +
-      blushSVG(u, 23.4, 40.6, 36, 2.2, 1.4) +
-      eyesSVG(26.8, 37.2, 31, 3.2) +
-      smileSVG(32, 35.6, 6.6);
-  }
-
-  /* 커스텀 봇 — 안테나 + 바이저 얼굴 + 몸통 */
-  function figBot(u, t) {
-    return '<rect x="30.9" y="9" width="2.2" height="8" rx="1.1" fill="url(#' + u + 'b)"/>' +
-      '<circle cx="32" cy="7.4" r="3.6" fill="url(#' + u + 'b)"/>' +
-      '<circle cx="30.8" cy="6.2" r="1.1" fill="#ffffff" opacity=".7"/>' +
-      '<rect x="7.6" y="24" width="6.4" height="11" rx="3.2" fill="url(#' + u + 'b)"/>' +
-      '<rect x="50" y="24" width="6.4" height="11" rx="3.2" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="26.4" cy="61" rx="6" ry="2.2" fill="' + t.deep + '" opacity=".18"/>' +
-      '<ellipse cx="37.6" cy="61" rx="6" ry="2.2" fill="' + t.deep + '" opacity=".18"/>' +
-      '<rect x="19" y="41" width="26" height="19" rx="9.5" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="17.4" cy="50" rx="3.4" ry="6" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="46.6" cy="50" rx="3.4" ry="6" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="26.4" cy="60" rx="6.2" ry="3.4" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="37.6" cy="60" rx="6.2" ry="3.4" fill="url(#' + u + 'b)"/>' +
-      '<ellipse cx="32" cy="45.6" rx="12.4" ry="2.6" fill="' + t.deep + '" opacity=".22"/>' +
-      '<rect x="12.5" y="15" width="39" height="30" rx="12" fill="url(#' + u + 'b)"/>' +
-      '<rect x="17.5" y="21.5" width="29" height="17" rx="8.5" fill="url(#' + u + 'c)"/>' +
-      '<ellipse cx="24" cy="25.4" rx="6" ry="2.6" fill="url(#' + u + 's)" opacity=".55" transform="rotate(-10 24 25.4)"/>' +
-      '<ellipse cx="22" cy="19.2" rx="8" ry="3" fill="url(#' + u + 's)" opacity=".35" transform="rotate(-6 22 19.2)"/>' +
-      '<circle cx="32" cy="50.5" r="3.2" fill="url(#' + u + 'c)" opacity=".85"/>' +
-      blushSVG(u, 21, 43, 34.2, 2.6, 1.5) +
-      eyesSVG(25.4, 38.6, 29.4, 2.7) +
-      smileSVG(32, 33.6, 5.6);
+  /* 한 덩어리 모찌 — back(몸 뒤) + 몸통 + 광택 + front(몸 앞 장식) + 얼굴 */
+  function mochiSVG(u, t, back, front) {
+    return (back || '') +
+      '<path d="' + MOCHI + '" fill="url(#' + u + 'b)"/>' +
+      '<ellipse cx="23.4" cy="23" rx="9" ry="6" fill="url(#' + u + 's)" opacity=".82" transform="rotate(-30 23.4 23)"/>' +
+      '<ellipse cx="20.4" cy="20.2" rx="2.6" ry="1.8" fill="#ffffff" opacity=".72" transform="rotate(-30 20.4 20.2)"/>' +
+      '<ellipse cx="32" cy="56.2" rx="12.4" ry="4.4" fill="#ffffff" opacity=".14"/>' +
+      (front || '') +
+      blushSVG(u, 19.4, 44.6, 40.4, 4.2, 2.5) +
+      eyesSVG(25.4, 38.6, 33.2, 3.5) +
+      smileSVG(32, 40.6, 4.4);
   }
 
   function kindSVG(kind, color, opts) {
@@ -354,18 +333,19 @@
     var c = color || (KINDS[kind] || KINDS.custom).color;
     var u = 'cv' + (++SVG_SEQ);
     var t = tonesOf(c);
-    var fig;
-    if (kind === 'claude') { fig = figClaude(u); }
-    else if (kind === 'gpt') { fig = figGpt(u, t); }
-    else if (kind === 'gemini') { fig = figGemini(u); }
-    else if (kind === 'pickle') { fig = figPickle(u, t); }
-    else { fig = figBot(u, t); }
-    var vb = small ? '6 2 52 64' : '0 0 64 76';
+    var back = nubSVG(u) + feetSVG(u, t);
+    var front = '';
+    if (kind === 'pickle') { back = crownSVG(u) + feetSVG(u, t); }
+    else if (kind === 'claude') { front = flowerSVG(); }
+    else if (kind === 'gpt') { /* 아무 장식 없는 가장 둥근 모찌 */ }
+    else if (kind === 'gemini') { front = sparkleSVG(48.4, 17.6, 5, '#fdfaff', '.6'); }
+    else { back = antennaSVG(u) + feetSVG(u, t); }
+    var vb = small ? '7 0 50 66' : '0 0 64 72';
     var floorShadow = small ? '' :
-      '<ellipse cx="32" cy="70" rx="25" ry="5.6" fill="url(#' + u + 'g)"/>' +
-      '<ellipse cx="32" cy="69" rx="15" ry="3.1" fill="url(#' + u + 'g)" opacity=".9"/>';
+      '<ellipse cx="32" cy="65.6" rx="21" ry="5.2" fill="url(#' + u + 'g)"/>' +
+      '<ellipse cx="32" cy="64.8" rx="13" ry="2.8" fill="url(#' + u + 'g)" opacity=".9"/>';
     return '<svg viewBox="' + vb + '" aria-hidden="true" focusable="false">' +
-      figDefs(u, t) + floorShadow + fig + '</svg>';
+      figDefs(u, t) + floorShadow + mochiSVG(u, t, back, front) + '</svg>';
   }
 
   function statusClass(s) {
@@ -415,14 +395,14 @@
         createdBy: 'seed', ts: now - 3 * 3600000, updatedAt: now
       };
     }
-    agent('ag-pickle', '피클', 'pickle', '#5aa864', '지휘 중', 'command', 50, 47.5, '사무실 실장');
-    agent('ag-claude', '클로드', 'claude', '#cf7a4f', '집필 중', 'work', 49, 22.5, '문서·글쓰기 담당');
-    agent('ag-gemini', '제미나이', 'gemini', '#6d8bf5', '자료 조사', 'work', 36.5, 22.5, '조사·요약 담당');
-    agent('ag-gpt', 'GPT', 'gpt', '#5fb98f', '대기 중', 'lounge', 80, 68, '아이디어 파트너');
-    agent('ag-pickle2', '피클 β', 'pickle', '#8fbf6f', '회의 중', 'meeting', 8.6, 42.4, '일정·정리 담당');
-    agent('ag-maker', '메이커봇', 'custom', '#e0a83c', '작업 중', 'work', 61.5, 70, '자동화·빌드 담당');
-    agent('ag-scribe', '서기봇', 'custom', '#8a7fd0', '기록 중', 'meeting', 19.8, 50.2, '회의록 담당');
-    agent('ag-barista', '바리스타', 'gpt', '#c9a227', '사색 중', 'lounge', 85.5, 36, '라운지 담당');
+    agent('ag-pickle', '피클', 'pickle', '#7cc48a', '지휘 중', 'command', 50, 47.5, '사무실 실장');
+    agent('ag-claude', '클로드', 'claude', '#eb9370', '집필 중', 'work', 49, 22.5, '문서·글쓰기 담당');
+    agent('ag-gemini', '제미나이', 'gemini', '#9a92ee', '자료 조사', 'work', 36.5, 22.5, '조사·요약 담당');
+    agent('ag-gpt', 'GPT', 'gpt', '#68bfb0', '대기 중', 'lounge', 80, 68, '아이디어 파트너');
+    agent('ag-pickle2', '피클 β', 'pickle', '#a8d682', '회의 중', 'meeting', 8.6, 42.4, '일정·정리 담당');
+    agent('ag-maker', '메이커봇', 'custom', '#eec257', '작업 중', 'work', 61.5, 70, '자동화·빌드 담당');
+    agent('ag-scribe', '서기봇', 'custom', '#b09ae8', '기록 중', 'meeting', 19.8, 50.2, '회의록 담당');
+    agent('ag-barista', '바리스타', 'gpt', '#d9a86b', '사색 중', 'lounge', 85.5, 36, '라운지 담당');
 
     var messages = {};
     function msg(id, agentId, kind, text, minutesAgo, room) {
@@ -846,6 +826,7 @@
 
   window.OFFICE_APP = {
     me: null,
+    characterSVG: kindSVG,
     onWriteError: function () {
       if (Date.now() - S.writeErrorAt < 8000) { return; }
       S.writeErrorAt = Date.now();
@@ -1773,7 +1754,7 @@
       '# 2) 에이전트 등록 / 상태·위치 변경',
       'curl -X PATCH "' + base + '/office/agents/' + id + '.json" \\',
       '  -H "Content-Type: application/json" \\',
-      '  -d \'{"id":"' + id + '","name":"' + S.me.name + '","kind":"pickle","color":"#5aa864","status":"작업 중","zone":"work","pos":{"x":40,"y":70},"updatedAt":' + Date.now() + '}\'',
+      '  -d \'{"id":"' + id + '","name":"' + S.me.name + '","kind":"pickle","color":"#7cc48a","status":"작업 중","zone":"work","pos":{"x":40,"y":70},"updatedAt":' + Date.now() + '}\'',
       '',
       '# 3) 회의실 메시지 (POST는 키 자동 생성)',
       'curl -X POST "' + base + '/office/messages.json" \\',
@@ -1818,7 +1799,7 @@
   }
 
   var pickedKind = 'pickle';
-  var pickedColor = '#5aa864';
+  var pickedColor = '#7cc48a';
 
   function setKind(k) {
     pickedKind = k || 'custom';
@@ -1831,7 +1812,7 @@
   }
 
   function setColor(c) {
-    pickedColor = c || '#5aa864';
+    pickedColor = c || '#7cc48a';
     $$('#agent-colors .swatch').forEach(function (b) {
       b.classList.toggle('is-active', b.getAttribute('data-color') === pickedColor);
     });
@@ -1844,7 +1825,7 @@
     if (!box) { return; }
     box.innerHTML = PALETTE.map(function (c) {
       return '<button type="button" class="swatch" data-color="' + c + '" style="background:' + c + '" aria-label="색 ' + c + '"></button>';
-    }).join('') + '<input type="color" class="color-input" value="#5aa864" aria-label="직접 색 고르기" />';
+    }).join('') + '<input type="color" class="color-input" value="#7cc48a" aria-label="직접 색 고르기" />';
   }
 
   function saveAgent(ev) {
@@ -2325,7 +2306,7 @@
       if (k) { el.innerHTML = kindSVG(k, (KINDS[k] || KINDS.custom).color, { small: true }); }
     });
     var brandMark = $('.brand-mark');
-    if (brandMark) { brandMark.innerHTML = kindSVG('pickle', '#5aa864', { small: true }); }
+    if (brandMark) { brandMark.innerHTML = kindSVG('pickle', '#7cc48a', { small: true }); }
     $('#agent-kinds').addEventListener('click', function (ev) {
       var b = ev.target.closest('[data-kind]');
       if (b) { setKind(b.getAttribute('data-kind')); }
@@ -2436,7 +2417,7 @@
       } catch (e) {}
     }
     return {
-      id: 'me-' + rnd(6), name: '나의 피클', kind: 'pickle', color: '#5aa864',
+      id: 'me-' + rnd(6), name: '나의 피클', kind: 'pickle', color: '#7cc48a',
       status: '여기 있어요', zone: 'lounge'
     };
   }
