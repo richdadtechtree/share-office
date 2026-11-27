@@ -1492,13 +1492,14 @@
     x = clamp(x, 2, 98);
     y = clamp(y, 4, 96);
     var z = zoneAt(x, y) || normalizeZone(a.zone);
+    var prev = normalizeZone(a.zone);
     S.db.patch('agents/' + id, { pos: { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 }, zone: z, updatedAt: Date.now() });
     if (isMine(a)) {
       S.me.zone = z;
       storeSet(KEY.me, JSON.stringify(S.me));
     }
     ripple(x, y);
-    toast(a.name + ' → ' + zoneName(z) + (z !== a.zone ? '' : ' 안'), 1600);
+    toast(a.name + ' → ' + zoneName(z) + (z === prev ? ' 안' : ''), 1600);
   }
 
   function ripple(x, y) {
