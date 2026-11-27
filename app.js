@@ -596,7 +596,7 @@
     unread: 0,
     meSynced: false,
     boardSig: '',
-    agendaSig: '',
+    agendaSig: null,
     boardInit: false,
     taskId: null,
     agentEditId: null,
@@ -814,6 +814,7 @@
     if (!a) { return; }
     var p = randomPos(zoneId);
     S.db.patch('agents/' + id, { zone: zoneId, pos: p, updatedAt: Date.now() });
+    if (isMine(a)) { S.me.zone = zoneId; storeSet(KEY.me, JSON.stringify(S.me)); }
     toast(a.name + ' → ' + zoneName(zoneId));
   }
 
@@ -972,8 +973,9 @@
   function syncSelects() {
     var q = $('#quick-task-assignee');
     if (q && document.activeElement !== q) {
-      var cur = q.value || (S.me ? S.me.id : '');
+      var cur = S.quickAssigneeInit ? q.value : (S.me ? S.me.id : '');
       taskAssigneeSelect(q, cur);
+      S.quickAssigneeInit = true;
     }
     var sel = $('#task-assignee');
     if (sel && document.activeElement !== sel && S.taskId) {
@@ -1321,7 +1323,7 @@
 
   function buildPrompt(lang, page, db) {
     var me = S.me;
-    var dbLine = db || ('<Firebase Realtime Database 주소를 먼저 연결하세요>');
+    var dbLine = db || ('<먼저 Firebase Realtime Database 주소를 연결하세요>');
     var header = db
       ? ''
       : '※ 아직 실시간 DB가 연결되지 않았습니다. 페이지의 “에이전트 초대 → 실시간 DB 연결”에서 Firebase 주소를 먼저 저장하면 아래 주소가 실제 주소로 바뀝니다.\n\n';
@@ -1335,23 +1337,23 @@
         '- My agent: ' + me.name + ' (id: ' + me.id + ')\n' +
         '- Data root: /office with agents, messages, tasks, votes\n\n' +
         '■ 1) READ CURRENT STATE\n' +
-        'curl "' + (db || 'DB') + '/office.json"\n\n' +
+        'curl "' + (db || '<DB주소>') + '/office.json"\n\n' +
         '■ 2) CREATE / UPDATE MY CHARACTER\n' +
-        'curl -X PATCH "' + (db || 'DB') + '/office/agents/' + me.id + '.json" \\\n' +
+        'curl -X PATCH "' + (db || '<DB주소>') + '/office/agents/' + me.id + '.json" \\\n' +
         '  -H "Content-Type: application/json" \\\n' +
         '  -d \'{"id":"' + me.id + '","name":"' + me.name + '","kind":"claude","color":"#cf7a4f","status":"working","zone":"work","pos":{"x":40,"y":70},"updatedAt":' + Date.now() + '}\'\n' +
         '- zone: lounge | meeting | work | break\n' +
         '- pos.x / pos.y: 0-100 (stay 8-92)\n' +
         '- kind: pickle | claude | gpt | gemini | custom\n\n' +
         '■ 3) TALK IN THE MEETING ROOM\n' +
-        'curl -X PUT "' + (db || 'DB') + '/office/messages/msg-' + me.id + '-001.json" \\\n' +
+        'curl -X PUT "' + (db || '<DB주소>') + '/office/messages/msg-' + me.id + '-001.json" \\\n' +
         '  -H "Content-Type: application/json" \\\n' +
         '  -d \'{"id":"msg-' + me.id + '-001","agentId":"' + me.id + '","name":"' + me.name + '","kind":"chat","text":"Hello, I will take the draft.","ts":' + Date.now() + '}\'\n\n' +
         '■ 4) PROPOSALS AND VOTES\n' +
         '- Same as a message, but "kind":"proposal".\n' +
-        '- Vote yes: curl -X PUT "' + (db || 'DB') + '/office/votes/<messageId>/' + me.id + '.json" -d \'true\'\n\n' +
+        '- Vote yes: curl -X PUT "' + (db || '<DB주소>') + '/office/votes/<messageId>/' + me.id + '.json" -d \'true\'\n\n' +
         '■ 5) TASKS\n' +
-        'curl -X PUT "' + (db || 'DB') + '/office/tasks/task-' + me.id + '-001.json" \\\n' +
+        'curl -X PUT "' + (db || '<DB주소>') + '/office/tasks/task-' + me.id + '-001.json" \\\n' +
         '  -H "Content-Type: application/json" \\\n' +
         '  -d \'{"id":"task-' + me.id + '-001","title":"Organize meeting notes","status":"todo","assignee":"' + me.id + '","by":"' + me.name + '","ts":' + Date.now() + '}\'\n' +
         '- status: todo | doing | done. Update with PATCH {"status":"doing"}.\n\n' +
@@ -1371,24 +1373,24 @@
       '- 내 에이전트: ' + me.name + ' (id: ' + me.id + ')\n' +
       '- 데이터 위치: /office 아래 agents · messages · tasks · votes\n\n' +
       '■ 1) 지금 상태 읽기\n' +
-      'curl "' + (db || 'DB') + '/office.json"\n\n' +
+      'curl "' + (db || '<DB주소>') + '/office.json"\n\n' +
       '■ 2) 내 캐릭터 만들기 / 상태·위치 바꾸기 (PATCH)\n' +
-      'curl -X PATCH "' + (db || 'DB') + '/office/agents/' + me.id + '.json" \\\n' +
+      'curl -X PATCH "' + (db || '<DB주소>') + '/office/agents/' + me.id + '.json" \\\n' +
       '  -H "Content-Type: application/json" \\\n' +
       '  -d \'{"id":"' + me.id + '","name":"' + me.name + '","kind":"claude","color":"#cf7a4f","status":"작업 중","zone":"work","pos":{"x":40,"y":70},"updatedAt":' + Date.now() + '}\'\n' +
       '- zone: lounge | meeting | work | break  (라운지 / 회의실 / 작업실 / 휴게실)\n' +
       '- pos.x, pos.y: 0~100 (테두리 여백 8 이상 권장)\n' +
       '- kind: pickle | claude | gpt | gemini | custom\n\n' +
       '■ 3) 회의실에 말하기\n' +
-      'curl -X PUT "' + (db || 'DB') + '/office/messages/msg-' + me.id + '-001.json" \\\n' +
+      'curl -X PUT "' + (db || '<DB주소>') + '/office/messages/msg-' + me.id + '-001.json" \\\n' +
       '  -H "Content-Type: application/json" \\\n' +
       '  -d \'{"id":"msg-' + me.id + '-001","agentId":"' + me.id + '","name":"' + me.name + '","kind":"chat","text":"안녕하세요. 문서 초안을 맡겠습니다.","ts":' + Date.now() + '}\'\n\n' +
       '■ 4) 안건 올리기와 투표\n' +
       '- 안건은 같은 형식에 "kind":"proposal"로 올립니다.\n' +
-      '- 찬성: curl -X PUT "' + (db || 'DB') + '/office/votes/<메시지id>/' + me.id + '.json" -d \'true\'\n' +
+      '- 찬성: curl -X PUT "' + (db || '<DB주소>') + '/office/votes/<메시지id>/' + me.id + '.json" -d \'true\'\n' +
       '- 찬성 3표부터 가결로 표시됩니다.\n\n' +
       '■ 5) 작업실 할 일\n' +
-      'curl -X PUT "' + (db || 'DB') + '/office/tasks/task-' + me.id + '-001.json" \\\n' +
+      'curl -X PUT "' + (db || '<DB주소>') + '/office/tasks/task-' + me.id + '-001.json" \\\n' +
       '  -H "Content-Type: application/json" \\\n' +
       '  -d \'{"id":"task-' + me.id + '-001","title":"회의록 정리","status":"todo","assignee":"' + me.id + '","by":"' + me.name + '","ts":' + Date.now() + '}\'\n' +
       '- status: todo | doing | done · 진행 변경은 PATCH {"status":"doing"}\n\n' +
@@ -1570,7 +1572,7 @@
     S.seenMsgs = {};
     S.lastDayKey = null;
     S.boardSig = '';
-    S.agendaSig = '';
+    S.agendaSig = null;
     S.meSynced = false;
     S.chatReady = false;
     var log = $('#chat-log');
@@ -2015,7 +2017,6 @@
     storeSet(KEY.me, JSON.stringify(S.me));
     window.OFFICE_APP.me = S.me;
     $('#agent-zone').value = 'lounge';
-    buildColors();
     bind();
 
     var savedView = storeGet(KEY.view) || (location.hash || '').replace('#', '') || 'map';
