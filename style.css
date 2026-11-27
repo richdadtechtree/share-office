@@ -272,16 +272,18 @@ html[data-theme="light"] .icon-round{ background:rgba(255,255,255,.75); }
   font-size:13px; font-weight:650; cursor:pointer; white-space:nowrap;
   transition:transform .12s, background .18s, border-color .18s, box-shadow .18s;
 }
-html[data-theme="light"] .btn{ background:var(--panel); }
+html[data-theme="light"] .btn:not(.btn-amber){ background:var(--panel); }
 .btn:hover{ transform:translateY(-1px); background:rgba(255,255,255,.09); }
 .btn:active{ transform:translateY(0) scale(.99); }
 .btn:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(233,187,119,.35); }
-.btn-amber{
+.btn-amber,
+.btn.btn-amber{
   background:var(--tab-on-bg); color:var(--tab-on-ink);
   border-color:transparent; font-weight:800;
   box-shadow:0 10px 22px -14px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.4);
 }
-.btn-amber:hover{ background:var(--tab-on-bg); filter:brightness(1.06); }
+.btn-amber:hover,
+.btn.btn-amber:hover{ background:var(--tab-on-bg); filter:brightness(1.06); }
 .btn-ghost{ background:transparent; border-color:transparent; color:var(--ink-2); }
 .btn-ghost:hover{ background:rgba(255,255,255,.06); border-color:var(--line); }
 .btn-danger{ color:var(--danger); }
