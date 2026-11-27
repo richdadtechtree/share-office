@@ -186,6 +186,8 @@ window.OFFICE_CONFIG = {
 
 `style.css`의 `:root` 변수(`--brand`, `--bg`, `--panel` …)로 전체 색감을 바꿀 수 있습니다.
 
+> CSS/JS를 고친 뒤 방문자 화면에 즉시 반영하고 싶으면 `index.html` 맨 아래 `style.css?v=…`, `app.js?v=…`의 버전 글자를 바꿔 배포하세요. (그냥 두어도 약 10분 뒤 자동 갱신됩니다.)
+
 ---
 
 ## 7. 문제 해결
