@@ -322,7 +322,7 @@ html[data-theme="light"] .btn:not(.btn-amber){ background:var(--panel); }
 .row.wrap{ flex-wrap:wrap; }
 .warn{ background:var(--gold-soft); border:1px solid rgba(233,187,119,.28); color:var(--gold); padding:10px 12px; border-radius:10px; font-size:12px; line-height:1.55; }
 
-main{ position:relative; z-index:1; max-width:1480px; margin:0 auto; padding:16px clamp(12px,2.2vw,26px) 28px; }
+main{ position:relative; z-index:1; max-width:1480px; margin:0 auto; padding:16px clamp(12px,2.2vw,26px) 28px; min-height:calc(100vh - 210px); }
 .view{ animation:viewIn .34s ease both; }
 .view[hidden]{ display:none !important; }
 @keyframes viewIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
