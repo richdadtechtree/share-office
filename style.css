@@ -1014,7 +1014,9 @@ html[data-theme="light"] .room-tab.is-active{
   .roster{ max-height:none; }
 
   .chat-top{ padding:10px 10px 0; }
-  .room-tab{ padding:6px 8px; font-size:11px; }
+  .room-tabs{ gap:2px; padding:3px; }
+  .room-tab{ padding:6px 6px; font-size:10.5px; gap:3px; }
+  .room-tab i{ font-size:11px; }
   .chat-log{ padding:12px 11px 6px; gap:11px; max-height:58vh; }
   .msg-body{ font-size:13px; padding:8px 11px; }
   .msg .avatar{ width:32px; height:32px; border-radius:10px; }
