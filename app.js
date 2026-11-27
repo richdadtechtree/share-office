@@ -285,7 +285,7 @@
     'C9.6 36.6 10.2 29.8 12.8 24.2C16.4 16.6 24 12.2 32 12.2Z';
 
   /* 몸 뒤쪽 — 짧은 발 두 개 */
-  function feetSVG(u, t) {
+  function feetSVG(u) {
     return '<ellipse cx="24.6" cy="61.8" rx="5.8" ry="3.5" fill="url(#' + u + 'b)"/>' +
       '<ellipse cx="39.4" cy="61.8" rx="5.8" ry="3.5" fill="url(#' + u + 'b)"/>';
   }
@@ -293,8 +293,8 @@
   function nubSVG(u) {
     return '<ellipse cx="32" cy="12.4" rx="3.4" ry="3.4" fill="url(#' + u + 'b)"/>';
   }
-  /* 피클 — ㅍ 모양 왕관 (가로대 + 두 다리) */
-  function crownSVG(u) {
+  /* 피클 — ㅍ의 두 다리처럼 머리 위로 솟은 작은 귀 두 개 */
+  function earsSVG(u) {
     return '<ellipse cx="28.3" cy="12.4" rx="3.1" ry="4.8" fill="url(#' + u + 'b)"/>' +
       '<ellipse cx="35.7" cy="12.4" rx="3.1" ry="4.8" fill="url(#' + u + 'b)"/>';
   }
@@ -318,7 +318,7 @@
   }
 
   /* 한 덩어리 모찌 — back(몸 뒤) + 몸통 + 광택 + front(몸 앞 장식) + 얼굴 */
-  function mochiSVG(u, t, back, front) {
+  function mochiSVG(u, back, front) {
     return (back || '') +
       '<path d="' + MOCHI + '" fill="url(#' + u + 'b)"/>' +
       '<ellipse cx="23.2" cy="22.8" rx="12" ry="8" fill="url(#' + u + 's)" opacity=".42" transform="rotate(-32 23.2 22.8)"/>' +
@@ -334,19 +334,19 @@
     var c = color || (KINDS[kind] || KINDS.custom).color;
     var u = 'cv' + (++SVG_SEQ);
     var t = tonesOf(c);
-    var back = nubSVG(u) + feetSVG(u, t);
+    var back = nubSVG(u) + feetSVG(u);
     var front = '';
-    if (kind === 'pickle') { back = crownSVG(u) + feetSVG(u, t); }
+    if (kind === 'pickle') { back = earsSVG(u) + feetSVG(u); }
     else if (kind === 'claude') { front = asteriskSVG(45.2, 20.4, 4.6, '#fffaf0', '.85'); }
     else if (kind === 'gpt') { /* 아무 장식 없는 가장 둥근 모찌 */ }
     else if (kind === 'gemini') { front = sparkleSVG(45.6, 19.4, 4.6, '#fdfaff', '.7'); }
-    else { back = antennaSVG(u) + feetSVG(u, t); }
+    else { back = antennaSVG(u) + feetSVG(u); }
     var vb = small ? '7 0 50 66' : '0 0 64 72';
     var floorShadow = small ? '' :
       '<ellipse cx="32" cy="65.6" rx="21" ry="5.2" fill="url(#' + u + 'g)"/>' +
       '<ellipse cx="32" cy="64.8" rx="13" ry="2.8" fill="url(#' + u + 'g)" opacity=".9"/>';
     return '<svg viewBox="' + vb + '" aria-hidden="true" focusable="false">' +
-      figDefs(u, t) + floorShadow + mochiSVG(u, t, back, front) + '</svg>';
+      figDefs(u, t) + floorShadow + mochiSVG(u, back, front) + '</svg>';
   }
 
   function statusClass(s) {
