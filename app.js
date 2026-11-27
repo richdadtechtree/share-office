@@ -228,32 +228,6 @@
     return null;
   }
 
-  function nearestAgentDist(p) {
-    var min = 1e9;
-    Object.keys(S.data.agents || {}).forEach(function (k) {
-      var a = S.data.agents[k];
-      if (!a || !a.pos || typeof a.pos.x !== 'number') { return; }
-      if (S.me && a.id === S.me.id) { return; }
-      var dx = a.pos.x - p.x;
-      var dy = (a.pos.y - p.y) * 1.7;
-      var d = Math.sqrt(dx * dx + dy * dy);
-      if (d < min) { min = d; }
-    });
-    return min;
-  }
-
-  function spawnPos(zoneId) {
-    var best = randomPos(zoneId);
-    var bestD = nearestAgentDist(best);
-    for (var i = 0; i < 14; i++) {
-      var p = randomPos(zoneId);
-      var d = nearestAgentDist(p);
-      if (d > 22) { return p; }
-      if (d > bestD) { bestD = d; best = p; }
-    }
-    return best;
-  }
-
   function randomPos(zoneId) {
     var z = ZONES[zoneId] || ZONES.lounge;
     return {
@@ -341,24 +315,40 @@
 
   /* ══════════════════════ 4. 저장소 ══════════════════════ */
 
+  var ZONE_SPOTS = [[0.20, 0.42], [0.50, 0.34], [0.80, 0.44], [0.32, 0.74], [0.64, 0.76], [0.50, 0.56]];
+
+  function slotPositions(zoneId) {
+    var z = ZONES[zoneId] || ZONES.lounge;
+    return ZONE_SPOTS.map(function (s) {
+      return {
+        x: Math.round(z.x + z.w * s[0] + (Math.random() * 5 - 2.5)),
+        y: Math.round(z.y + z.h * s[1] + (Math.random() * 4 - 2))
+      };
+    });
+  }
+
   function spreadPosIn(data, zoneId, selfId) {
-    var best = randomPos(zoneId);
+    var cands = slotPositions(zoneId);
+    var best = cands[0];
     var bestD = -1;
-    for (var i = 0; i < 12; i++) {
-      var p = randomPos(zoneId);
+    cands.forEach(function (p) {
       var min = 1e9;
-      Object.keys(data.agents || {}).forEach(function (k) {
+      Object.keys((data && data.agents) || {}).forEach(function (k) {
+        if (k === selfId) { return; }
         var o = data.agents[k];
-        if (!o || !o.pos || typeof o.pos.x !== 'number' || k === selfId) { return; }
+        if (!o || !o.pos || typeof o.pos.x !== 'number') { return; }
         var dx = o.pos.x - p.x;
         var dy = (o.pos.y - p.y) * 1.7;
         var d = Math.sqrt(dx * dx + dy * dy);
         if (d < min) { min = d; }
       });
       if (min > bestD) { bestD = min; best = p; }
-      if (min > 26) { break; }
-    }
+    });
     return best;
+  }
+
+  function spawnPos(zoneId) {
+    return spreadPosIn(S.data, zoneId, S.me && S.me.id);
   }
 
   function DemoStore() {
