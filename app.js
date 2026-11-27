@@ -409,7 +409,7 @@
       });
       var calm = ZONE_ORDER.slice().sort(function (x, y) { return (counts[x] || 0) - (counts[y] || 0); });
       var targetZone;
-      if (Math.random() < 0.55 && (counts[a.zone] || 0) <= 2) {
+      if (Math.random() < 0.55 && (counts[a.zone] || 0) < 2) {
         targetZone = a.zone || 'lounge';
       } else {
         targetZone = calm[Math.floor(Math.random() * 2)];
