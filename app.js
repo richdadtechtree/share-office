@@ -372,12 +372,12 @@
         createdBy: 'seed', ts: now - 3 * 3600000, updatedAt: now
       };
     }
-    agent('ag-pickle', '피클', 'pickle', '#5aa864', '작업 중', 'work', 22, 76, '합동 비서실 실장');
-    agent('ag-claude', '클로드', 'claude', '#cf7a4f', '집필 중', 'work', 42, 84, '문서·글쓰기 담당');
-    agent('ag-gemini', '제미나이', 'gemini', '#6d8bf5', '자료 조사', 'lounge', 34, 39, '조사·요약 담당');
-    agent('ag-gpt', 'GPT', 'gpt', '#5fb98f', '대기 중', 'break', 70, 79, '아이디어 파트너');
-    agent('ag-pickle2', '피클 β', 'pickle', '#8fbf6f', '생각 중', 'lounge', 15, 29, '일정·정리 담당');
-    agent('ag-maker', '메이커봇', 'custom', '#e0a83c', '회의 중', 'meeting', 68, 33, '자동화·빌드 담당');
+    agent('ag-pickle', '피클', 'pickle', '#5aa864', '작업 중', 'work', 13, 65, '합동 비서실 실장');
+    agent('ag-claude', '클로드', 'claude', '#cf7a4f', '집필 중', 'work', 39, 85, '문서·글쓰기 담당');
+    agent('ag-gemini', '제미나이', 'gemini', '#6d8bf5', '자료 조사', 'lounge', 36, 17, '조사·요약 담당');
+    agent('ag-gpt', 'GPT', 'gpt', '#5fb98f', '대기 중', 'break', 66, 86, '아이디어 파트너');
+    agent('ag-pickle2', '피클 β', 'pickle', '#8fbf6f', '생각 중', 'lounge', 12, 37, '일정·정리 담당');
+    agent('ag-maker', '메이커봇', 'custom', '#e0a83c', '회의 중', 'meeting', 87, 18, '자동화·빌드 담당');
 
     var messages = {};
     function msg(id, agentId, kind, text, minutesAgo) {
