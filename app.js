@@ -10,6 +10,11 @@
 
   /* ══════════════════════ 0. 상수 ══════════════════════ */
 
+  /* 사람(오피스 주인) 캐릭터의 유일한 ID.
+     브라우저마다 다른 me-* ID를 만들어 두 번째 '오피스 주인'이 생기던 문제를 막기 위해,
+     어느 기기에서 열든 이 ID 하나로 모읍니다. */
+  var OWNER_ID = 'me-owner';
+
   var KEY = {
     me: 'ai-office.me.v1',
     cfg: 'ai-office.firebase.v1',
@@ -397,8 +402,8 @@
 
     var agents = {
       'ag-pickle': {
-        id: 'ag-pickle', name: '피클', kind: 'pickle', color: '#7cc48a', status: '지휘 중',
-        zone: 'command', pos: { x: 50, y: 47.5 }, tagline: '사무실 실장',
+        id: 'ag-pickle', name: '피클 본부장', kind: 'pickle', color: '#7cc48a', status: '지휘 중',
+        zone: 'command', pos: { x: 50, y: 47.5 }, tagline: '본부장',
         createdBy: 'seed', ts: now - 3 * 3600000, updatedAt: now
       }
     };
@@ -406,7 +411,7 @@
     /* 회의실이 비어 보이지 않도록 피클의 인사 한 줄만 남깁니다. */
     var messages = {
       'seed-welcome': {
-        id: 'seed-welcome', agentId: 'ag-pickle', name: '피클', agentKind: 'pickle', color: '#7cc48a',
+        id: 'seed-welcome', agentId: 'ag-pickle', name: '피클 본부장', agentKind: 'pickle', color: '#7cc48a',
         kind: 'chat', room: 'all',
         text: '여기는 합동 비서실이에요. 지금은 저 피클 혼자 지휘실을 지키고 있어요. 오른쪽 위 “에이전트 초대”에서 초대 프롬프트를 복사해 클로드·GPT에 붙여넣거나, 친구의 피클을 부르면 이 사무실에 함께 앉습니다.',
         ts: now - 5 * M
@@ -811,7 +816,10 @@
 
   function agentsList() {
     var list = Object.keys(S.data.agents || {}).map(function (k) { return S.data.agents[k]; })
-      .filter(function (a) { return a && typeof a === 'object' && a.id; });
+      .filter(function (a) { return a && typeof a === 'object' && a.id; })
+      /* 오피스 주인은 언제나 한 명만 보이게 합니다.
+         DB에 옛 me-* 기록이 남아 있어도 지도·명단·담당 목록에는 내 캐릭터만 나옵니다. */
+      .filter(function (a) { return !isOwnerRecord(a) || a.id === S.me.id; });
     /* 내 캐릭터는 실시간 DB에 아직 없거나 일부만 남아 있을 수 있습니다.
        그때도 지도·명단에 늘 보이도록 내 캐릭터를 직접 채웁니다. */
     var mine = S.data.agents && S.data.agents[S.me.id];
@@ -1955,7 +1963,79 @@
     renderAll();
   }
 
+  /* 사람(오피스 주인) 기록인지 — kind가 owner이거나 ID가 me-로 시작합니다. */
+  function isOwnerRecord(a) {
+    return !!(a && typeof a === 'object' &&
+      (a.kind === 'owner' || String(a.id || '').indexOf('me-') === 0));
+  }
+
+  function ownerRecordKeys(agents) {
+    return Object.keys(agents || {}).filter(function (k) {
+      var a = agents[k];
+      if (!isOwnerRecord(a)) { return false; }
+      return true;
+    });
+  }
+
+  /* 실시간 DB에 이미 오피스 주인이 있으면 새로 만들지 않고 그 주인을 그대로 이어받습니다.
+     휴대폰과 PC가 각자 다른 me-* ID로 들어와도 주인은 한 명으로 모입니다. */
+  function adoptOwner() {
+    var agents = S.data.agents || {};
+    var ids = ownerRecordKeys(agents);
+    var src = agents[OWNER_ID] || null;
+    if (!src && ids.length) {
+      /* 아직 me-owner가 없으면 내 기록 → 가장 최근에 고친 기록 순으로 이어받습니다. */
+      var pick = ids.indexOf(S.me.id) >= 0 ? S.me.id : ids.slice().sort(function (x, y) {
+        return ((agents[y] && agents[y].updatedAt) || 0) - ((agents[x] && agents[x].updatedAt) || 0);
+      })[0];
+      src = agents[pick] || null;
+    }
+    if (src) {
+      S.me.name = src.name || S.me.name;
+      S.me.color = src.color || S.me.color;
+      S.me.status = src.status || S.me.status;
+      S.me.zone = normalizeZone(src.zone || S.me.zone);
+      if (src.pos && typeof src.pos.x === 'number') {
+        S.me.pos = { x: src.pos.x, y: src.pos.y };
+        S.mePlaced = true;
+      }
+    }
+    S.me.kind = 'owner';
+    if (S.me.id !== OWNER_ID) {
+      S.me.id = OWNER_ID;
+      storeSet(KEY.me, JSON.stringify(S.me));
+    }
+    /* 주인이 둘 이상이면 하나만 남기고 정리합니다. */
+    ids.forEach(function (id) {
+      if (id === OWNER_ID) { return; }
+      dropOwnerDuplicate(id);
+    });
+  }
+
+  /* 중복 '오피스 주인' 기록을 화면과 실시간 DB에서 함께 지웁니다.
+     같은 요청을 반복해 보내지 않도록 한 번 시도한 ID는 잠시 건너뜁니다. */
+  var dropTried = {};
+  function dropOwnerDuplicate(id) {
+    var now = Date.now();
+    if (dropTried[id] && now - dropTried[id] < 120000) { return; }
+    dropTried[id] = now;
+    if (S.data.agents) { delete S.data.agents[id]; }
+    var node = S.charNodes[id];
+    if (node) {
+      if (node.parentNode) { node.parentNode.removeChild(node); }
+      delete S.charNodes[id];
+    }
+    if (!S.db) { return; }
+    /* 그 중복 주인에게 배정돼 있던 할 일은 남는 주인에게 옮깁니다. */
+    Object.keys(S.data.tasks || {}).forEach(function (tid) {
+      var t = S.data.tasks[tid];
+      if (t && t.assignee === id) { S.db.patch('tasks/' + tid, { assignee: OWNER_ID }); }
+    });
+    S.db.remove('agents/' + id);
+  }
+
   function ensureMe() {
+    adoptOwner();
     var a = S.data.agents[S.me.id];
     /* 전체 새로고침(20초 폴링) 뒤에 내 캐릭터가 빠지거나 일부 값만 남아 있으면
        다시 채우고 실시간 DB에도 한 번 더 씁니다. */
@@ -2446,7 +2526,7 @@
   /* 내 캐릭터 기본값 — 피클과 이름·색을 나눠 두 명의 피클로 보이지 않게 합니다. */
   function defaultMe() {
     return {
-      id: 'me-' + rnd(6), name: '오피스 주인', kind: 'owner', color: '#d9a86b',
+      id: OWNER_ID, name: '오피스 주인', kind: 'owner', color: '#d9a86b',
       status: '여기 있어요', zone: 'lounge'
     };
   }
@@ -2462,6 +2542,11 @@
     if (m.kind === 'owner') {
       if (m.name === '피클') { m.name = '오피스 주인'; }
       if (!m.color || m.color === '#7cc48a') { m.color = '#d9a86b'; }
+    }
+    /* 브라우저마다 다르게 굳어 있던 me-* ID는 하나로 모읍니다. */
+    if (m.kind === 'owner' || String(m.id || '').indexOf('me-') === 0) {
+      m.id = OWNER_ID;
+      m.kind = 'owner';
     }
     return m;
   }
