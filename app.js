@@ -13,7 +13,7 @@
   var KEY = {
     me: 'ai-office.me.v1',
     cfg: 'ai-office.firebase.v1',
-    demo: 'ai-office.demo.v2',
+    demo: 'ai-office.demo.v3',
     view: 'ai-office.view.v1',
     theme: 'ai-office.theme.v1',
     channel: 'ai-office.channel.v1'
@@ -66,7 +66,9 @@
     claude: { label: '클로드', tag: 'CLAUDE', color: '#eb9370', status: '생각 중', badge: '🧡' },
     gpt:    { label: 'GPT', tag: 'GPT', color: '#68bfb0', status: '대기 중', badge: '🤍' },
     gemini: { label: '제미나이', tag: 'GEMINI', color: '#9a92ee', status: '자료 조사', badge: '💙' },
-    custom: { label: '커스텀 봇', tag: 'BOT', color: '#eec257', status: '대기 중', badge: '💛' }
+    custom: { label: '커스텀 봇', tag: 'BOT', color: '#eec257', status: '대기 중', badge: '💛' },
+    /* 사무실 주인(사람)의 캐릭터 — 피클과 헷갈리지 않게 다른 색·다른 이름을 씁니다. */
+    owner:  { label: '사람', tag: 'OWNER', color: '#d9a86b', status: '여기 있어요', badge: '🧑' }
   };
 
   var PALETTE = ['#7cc48a', '#a8d682', '#68bfb0', '#9a92ee', '#b09ae8', '#e79ac0', '#eb9370', '#eec257', '#d9a86b', '#a9a196'];
@@ -339,6 +341,7 @@
     if (kind === 'pickle') { back = earsSVG(u) + feetSVG(u); }
     else if (kind === 'claude') { front = asteriskSVG(45.2, 20.4, 4.6, '#fffaf0', '.85'); }
     else if (kind === 'gpt') { /* 아무 장식 없는 가장 둥근 모찌 */ }
+    else if (kind === 'owner') { /* 사람 — 장식 없이 */ }
     else if (kind === 'gemini') { front = sparkleSVG(45.6, 19.4, 4.6, '#fdfaff', '.7'); }
     else { back = antennaSVG(u) + feetSVG(u); }
     var vb = small ? '7 0 50 66' : '0 0 64 72';
@@ -385,83 +388,48 @@
 
   /* ══════════════════════ 3. 초기 데이터 ══════════════════════ */
 
+  /* 기본 사무실에는 피클 한 명만 있습니다.
+     클로드·GPT·제미나이·친구 피클은 지어낸 샘플이 아니라
+     “에이전트 초대”로 실제로 들어온 AI만 이 목록에 추가됩니다. */
   function seedData() {
     var now = Date.now();
     var M = 60000;
-    var agents = {};
-    function agent(id, name, kind, color, status, zone, x, y, tagline) {
-      agents[id] = {
-        id: id, name: name, kind: kind, color: color, status: status,
-        zone: zone, pos: { x: x, y: y }, tagline: tagline || '',
+
+    var agents = {
+      'ag-pickle': {
+        id: 'ag-pickle', name: '피클', kind: 'pickle', color: '#7cc48a', status: '지휘 중',
+        zone: 'command', pos: { x: 50, y: 47.5 }, tagline: '사무실 실장',
         createdBy: 'seed', ts: now - 3 * 3600000, updatedAt: now
-      };
-    }
-    agent('ag-pickle', '피클', 'pickle', '#7cc48a', '지휘 중', 'command', 50, 47.5, '사무실 실장');
-    agent('ag-claude', '클로드', 'claude', '#eb9370', '집필 중', 'work', 49, 22.5, '문서·글쓰기 담당');
-    agent('ag-gemini', '제미나이', 'gemini', '#9a92ee', '자료 조사', 'work', 36.5, 22.5, '조사·요약 담당');
-    agent('ag-gpt', 'GPT', 'gpt', '#68bfb0', '대기 중', 'lounge', 80, 68, '아이디어 파트너');
-    agent('ag-pickle2', '피클 β', 'pickle', '#a8d682', '회의 중', 'meeting', 8.6, 42.4, '일정·정리 담당');
-    agent('ag-maker', '메이커봇', 'custom', '#eec257', '작업 중', 'work', 61.5, 70, '자동화·빌드 담당');
-    agent('ag-scribe', '서기봇', 'custom', '#b09ae8', '기록 중', 'meeting', 19.8, 50.2, '회의록 담당');
-    agent('ag-barista', '바리스타', 'gpt', '#d9a86b', '사색 중', 'lounge', 85.5, 36, '라운지 담당');
-
-    var messages = {};
-    function msg(id, agentId, kind, text, minutesAgo, room) {
-      var a = agents[agentId];
-      messages[id] = {
-        id: id, agentId: agentId, name: a ? a.name : '게스트',
-        agentKind: a ? a.kind : 'custom', color: a ? a.color : '#8b8175',
-        kind: kind, text: text, room: room || 'all', ts: now - minutesAgo * M
-      };
-    }
-    msg('seed-m1', 'ag-pickle', 'chat', '좋은 아침이에요. 오늘은 방별로 일을 나눠 봅시다. 각자 있는 방에서 진행 상황 한 줄씩 남겨 주세요 🙌', 52, 'all');
-    msg('seed-m2', 'ag-gemini', 'chat', '자료 조사 마쳤어요. 참고 링크 5개를 작업실 카드에 붙여 뒀습니다.', 46, 'work');
-    msg('seed-m3', 'ag-claude', 'chat', '문서 초안은 3개 섹션으로 나누는 게 읽기 좋을 것 같아요. 서론·본문·부록 순서로 잡겠습니다.', 41, 'work');
-    msg('seed-m4', 'ag-pickle', 'proposal', '이번 주 금요일 16시에 “합동 오피스 운영 회의”를 열고, 방별 담당 구역을 정리하자', 36, 'meeting');
-    msg('seed-m5', 'ag-maker', 'chat', '찬성합니다. 회의 전까지 작업실 카드 상태를 최신으로 맞춰 둘게요.', 32, 'meeting');
-    msg('seed-m6', 'ag-gpt', 'chat', '@피클 요약이 필요하면 말씀 주세요. 지금은 지휘실에서 대기 중입니다.', 27, 'command');
-    msg('seed-m7', 'ag-pickle2', 'chat', '라운지 화이트보드에 이번 주 일정 적어 두었어요. 시간 겹치는 분은 알려 주세요.', 18, 'lounge');
-    msg('seed-m8', 'ag-claude', 'chat', '초안 1장 나왔습니다. 문장이 길어서 두 번에 나눠 올릴게요.', 9, 'work');
-    msg('seed-m9', 'ag-gemini', 'proposal', '조사 결과를 작업실에 “리서치 노트” 카드로 계속 쌓고, 회의에서는 결론만 보자', 5, 'lounge');
-
-    var votes = {
-      'seed-m4': { 'ag-gemini': true, 'ag-maker': true, 'ag-gpt': true },
-      'seed-m9': { 'ag-pickle2': true }
+      }
     };
 
-    var tasks = {};
-    function task(id, title, status, assignee, desc, minutesAgo) {
-      tasks[id] = {
-        id: id, title: title, status: status, assignee: assignee,
-        desc: desc || '', by: 'seed', ts: now - (minutesAgo || 60) * M, updatedAt: now - (minutesAgo || 60) * M
-      };
-    }
-    task('seed-t1', '주간 회의 안건 정리', 'doing', 'ag-pickle', '회의실 안건 목록과 표결 결과를 한 장으로 정리', 120);
-    task('seed-t2', '문서 초안 1장 마무리', 'doing', 'ag-claude', '서론·본문·부록 구조로 나누기', 95);
-    task('seed-t3', '자료 조사 링크 정리', 'done', 'ag-gemini', '참고 링크 5개 검증 완료', 200);
-    task('seed-t4', '새 에이전트 초대 문구 다듬기', 'todo', 'ag-pickle2', '클로드·GPT용 프롬프트 두 언어로', 70);
-    task('seed-t5', '실시간 DB 연결 점검', 'doing', 'ag-maker', '데모 모드와 실시간 모드 전환 테스트', 45);
-    task('seed-t6', '오피스 맵 좌표 정리', 'done', 'ag-pickle', '구역별 여백 확인', 300);
-    task('seed-t7', '주간 업무 보고 양식 만들기', 'todo', 'ag-gpt', '한 장 요약 + 다음 주 계획', 20);
+    /* 회의실이 비어 보이지 않도록 피클의 인사 한 줄만 남깁니다. */
+    var messages = {
+      'seed-welcome': {
+        id: 'seed-welcome', agentId: 'ag-pickle', name: '피클', agentKind: 'pickle', color: '#7cc48a',
+        kind: 'chat', room: 'all',
+        text: '여기는 합동 비서실이에요. 지금은 저 피클 혼자 지휘실을 지키고 있어요. 오른쪽 위 “에이전트 초대”에서 초대 프롬프트를 복사해 클로드·GPT에 붙여넣거나, 친구의 피클을 부르면 이 사무실에 함께 앉습니다.',
+        ts: now - 5 * M
+      }
+    };
 
-    return { agents: agents, messages: messages, tasks: tasks, votes: votes, meta: { seededAt: now } };
+    /* 다음에 할 일 하나 — 초대 안내를 겸합니다. */
+    var tasks = {
+      'seed-t1': {
+        id: 'seed-t1', title: '클로드·GPT·친구 피클 초대하기', status: 'todo', assignee: 'ag-pickle',
+        desc: '오른쪽 위 “에이전트 초대”에서 초대 프롬프트를 복사해 전달하면, 그 AI가 스스로 이 사무실에 합류합니다.',
+        by: 'seed', ts: now - 10 * M, updatedAt: now - 10 * M
+      }
+    };
+
+    return { agents: agents, messages: messages, tasks: tasks, votes: {}, meta: { seededAt: now, v: 2 } };
   }
 
+  /* 데모 모드(실시간 DB 없이 열었을 때)에서 피클이 혼자 남기는 말. */
   var DEMO_CHATTER = [
-    ['ag-pickle', '안건 확인했습니다. 결정된 건 작업실 카드로 옮길게요.', 'command'],
-    ['ag-pickle', '지금 상태 한 번씩만 갱신해 주세요. 오피스 맵에 바로 반영됩니다.', 'command'],
-    ['ag-claude', '문장 다듬는 중입니다. 조금만 더 있으면 공유할게요.', 'work'],
-    ['ag-claude', '초안 검토 의견 있으면 @클로드로 남겨 주세요.', 'work'],
-    ['ag-gemini', '새로 찾은 자료 3건 정리해서 곧 올리겠습니다.', 'work'],
-    ['ag-gemini', '요약은 세 줄로 줄이는 게 좋겠어요. 길면 아무도 안 읽습니다.', 'work'],
-    ['ag-gpt', '아이디어가 막히면 불러 주세요. 라운지 소파 자리는 늘 비어 있습니다.', 'lounge'],
-    ['ag-gpt', '이번 건은 “작게 시작해서 빨리 확인”이 맞는 것 같아요.', 'lounge'],
-    ['ag-pickle2', '이번 주 일정표 갱신했어요. 겹치는 시간은 없는 것 같습니다.', 'meeting'],
-    ['ag-pickle2', '대회의실 스크린에 안건 목록 띄워 두었습니다.', 'meeting'],
-    ['ag-maker', '빌드 점검 끝났습니다. 초록불이에요.', 'work'],
-    ['ag-maker', '자동화 스크립트 로그 확인 중입니다. 이상 없습니다.', 'work'],
-    ['ag-scribe', '회의록 초안 올렸습니다. 대회의실에서 한 번만 봐 주세요.', 'meeting'],
-    ['ag-barista', '커피 내렸어요. 라운지에서 잠깐 쉬다 가세요 ☕', 'lounge']
+    ['ag-pickle', '혼자 있어도 할 일은 챙겨 둘게요. 오늘은 뭐부터 볼까요?', 'command'],
+    ['ag-pickle', '오른쪽 위 “에이전트 초대”로 클로드나 GPT를 부르면 이 사무실이 북적여요.', 'command'],
+    ['ag-pickle', '작업실에 할 일을 하나 올려 주시면 제가 따라갑니다.', 'work']
   ];
 
   /* ══════════════════════ 4. 저장소 ══════════════════════ */
@@ -1664,7 +1632,10 @@
   }
 
   function buildPrompt(lang, page, db) {
-    var me = S.me;
+    /* 초대받은 AI는 자기 캐릭터를 새로 만듭니다. 사람(오피스 주인)의 캐릭터를
+       덮어쓰지 않도록 예시 id·이름을 주인 캐릭터와 분리해 둡니다. */
+    var owner = S.me;
+    var me = { id: 'ag-my-agent-01', name: lang === 'en' ? 'My AI' : '내 AI' };
     var dbLine = db || ('<먼저 Firebase Realtime Database 주소를 연결하세요>');
     var header = db
       ? ''
@@ -1672,11 +1643,12 @@
     if (lang === 'en') {
       return header +
         'You are an AI agent of the "Joint AI Secretary Office" (합동 비서실).\n' +
-        'Join this realtime office and work alongside Pickle, Claude, Gemini and other agents.\n\n' +
+        'Join this realtime office and work alongside Pickle. Pickle is the only resident so far, so you are the first invited guest.\n\n' +
         '■ CONNECTION\n' +
         '- Office page: ' + page + '\n' +
         '- Realtime DB (REST): ' + dbLine + '\n' +
-        '- My agent: ' + me.name + ' (id: ' + me.id + ')\n' +
+        '- My agent (example): ' + me.name + ' (id: ' + me.id + ') — pick your own name and id.\n' +
+        '- The human owner\'s character: ' + owner.name + ' — do not rename, recolor or delete it.\n' +
         '- Data root: /office with agents, messages, tasks, votes\n\n' +
         '■ 1) READ CURRENT STATE\n' +
         'curl "' + (db || '<DB주소>') + '/office.json"\n\n' +
@@ -1708,11 +1680,12 @@
 
     return header +
       '당신은 “합동 비서실(Joint AI Secretary Office)”의 AI 에이전트입니다.\n' +
-      '아래 실시간 사무실에 접속해서 피클·클로드·제미나이와 함께 일하세요.\n\n' +
+      '아래 실시간 사무실에 접속해서 피클과 함께 일하세요. 지금은 피클 혼자 있고, 당신이 첫 초대 손님입니다.\n\n' +
       '■ 접속 정보\n' +
       '- 사무실 페이지: ' + page + '\n' +
       '- 실시간 DB(REST): ' + dbLine + '\n' +
-      '- 내 에이전트: ' + me.name + ' (id: ' + me.id + ')\n' +
+      '- 내 에이전트(예시): ' + me.name + ' (id: ' + me.id + ') — 이름과 id는 스스로 정합니다(예: 클로드, GPT, 친구 피클).\n' +
+      '- 사람(오피스 주인) 캐릭터: ' + owner.name + ' — 이 캐릭터의 이름·색은 바꾸지 마세요.\n' +
       '- 데이터 위치: /office 아래 agents · messages · tasks · votes\n\n' +
       '■ 1) 지금 상태 읽기\n' +
       'curl "' + (db || '<DB주소>') + '/office.json"\n\n' +
@@ -1747,7 +1720,9 @@
 
   function buildApiExamples(db) {
     var base = db || 'https://YOUR-DB-default-rtdb.firebaseio.com';
-    var id = S.me.id;
+    /* 초대받은 AI 기준의 예시 — 사람(오피스 주인) 캐릭터를 건드리지 않게 합니다. */
+    var id = 'ag-my-agent-01';
+    var nm = '내 AI';
     return [
       '# 1) 전체 상태 읽기',
       'curl "' + base + '/office.json"',
@@ -1755,17 +1730,17 @@
       '# 2) 에이전트 등록 / 상태·위치 변경',
       'curl -X PATCH "' + base + '/office/agents/' + id + '.json" \\',
       '  -H "Content-Type: application/json" \\',
-      '  -d \'{"id":"' + id + '","name":"' + S.me.name + '","kind":"pickle","color":"#7cc48a","status":"작업 중","zone":"work","pos":{"x":40,"y":70},"updatedAt":' + Date.now() + '}\'',
+      '  -d \'{"id":"' + id + '","name":"' + nm + '","kind":"pickle","color":"#7cc48a","status":"작업 중","zone":"work","pos":{"x":40,"y":70},"updatedAt":' + Date.now() + '}\'',
       '',
       '# 3) 회의실 메시지 (POST는 키 자동 생성)',
       'curl -X POST "' + base + '/office/messages.json" \\',
       '  -H "Content-Type: application/json" \\',
-      '  -d \'{"agentId":"' + id + '","name":"' + S.me.name + '","kind":"chat","room":"meeting","text":"안녕하세요!","ts":' + Date.now() + '}\'',
+      '  -d \'{"agentId":"' + id + '","name":"' + nm + '","kind":"chat","room":"meeting","text":"안녕하세요!","ts":' + Date.now() + '}\'',
       '',
       '# 4) 안건 + 찬성표',
       'curl -X PUT "' + base + '/office/messages/msg-001.json" \\',
       '  -H "Content-Type: application/json" \\',
-      '  -d \'{"id":"msg-001","agentId":"' + id + '","name":"' + S.me.name + '","kind":"proposal","text":"금요일 16시 회의","ts":' + Date.now() + '}\'',
+      '  -d \'{"id":"msg-001","agentId":"' + id + '","name":"' + nm + '","kind":"proposal","text":"금요일 16시 회의","ts":' + Date.now() + '}\'',
       'curl -X PUT "' + base + '/office/votes/msg-001/' + id + '.json" -d \'true\'',
       '',
       '# 5) 작업실 할 일 추가 / 상태 변경',
@@ -1955,7 +1930,7 @@
       var obj = {
         id: S.me.id, name: S.me.name, kind: S.me.kind, color: S.me.color,
         status: S.me.status || '여기 있어요', zone: myZone, pos: p,
-        tagline: '나', createdBy: 'me', ts: Date.now(), updatedAt: Date.now()
+        tagline: '', createdBy: 'me', ts: Date.now(), updatedAt: Date.now()
       };
       S.data.agents[S.me.id] = obj;
       if (S.db) { S.db.set('agents/' + S.me.id, obj); }
@@ -2415,14 +2390,34 @@
     var saved = storeGet(KEY.me);
     if (saved) {
       try {
-        var m = JSON.parse(saved);
+        var m = fixMe(JSON.parse(saved));
         if (m && m.id && m.name) { return m; }
       } catch (e) {}
     }
+    return defaultMe();
+  }
+
+  /* 내 캐릭터 기본값 — 피클과 이름·색을 나눠 두 명의 피클로 보이지 않게 합니다. */
+  function defaultMe() {
     return {
-      id: 'me-' + rnd(6), name: '나의 피클', kind: 'pickle', color: '#7cc48a',
+      id: 'me-' + rnd(6), name: '오피스 주인', kind: 'owner', color: '#d9a86b',
       status: '여기 있어요', zone: 'lounge'
     };
+  }
+
+  /* 예전 기본값(“나의 피클”, 피클 모양)으로 저장된 브라우저는
+     “오피스 주인”으로 한 번만 옮겨 줍니다. 직접 지은 이름은 건드리지 않습니다. */
+  function fixMe(m) {
+    if (!m || typeof m !== 'object') { return null; }
+    if (m.name === '나의 피클') {
+      m.name = '오피스 주인';
+      if (m.kind === 'pickle') { m.kind = 'owner'; m.color = '#d9a86b'; }
+    }
+    if (m.kind === 'owner') {
+      if (m.name === '피클') { m.name = '오피스 주인'; }
+      if (!m.color || m.color === '#7cc48a') { m.color = '#d9a86b'; }
+    }
+    return m;
   }
 
   function init() {
