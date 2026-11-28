@@ -607,9 +607,14 @@
     this.closed = false;
   }
 
+  /* 실시간 DB의 데이터 뿌리. 에이전트·메시지·할 일은 모두 /office 아래에 있습니다.
+     (경로에 이미 office가 붙어 있으면 그대로 씁니다 — 읽기는 ep('office')) */
+  var DB_ROOT = 'office';
+
   LiveStore.prototype.ep = function (path) {
-    var p = path ? '/' + String(path).split('/').filter(Boolean).map(encodeURIComponent).join('/') : '';
-    return this.url + p + '.json';
+    var parts = String(path || '').split('/').filter(Boolean);
+    if (!parts.length || parts[0] !== DB_ROOT) { parts.unshift(DB_ROOT); }
+    return this.url + '/' + parts.map(encodeURIComponent).join('/') + '.json';
   };
   LiveStore.prototype.on = function (fn) {
     this.listeners.push(fn);
