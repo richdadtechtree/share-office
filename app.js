@@ -1977,7 +1977,9 @@
       var live = new LiveStore(url);
       attach(live, true);
       setConn('connecting', '연결 중…');
-      live.start().catch(function (err) {
+      live.start().then(function () {
+        setConn('live', '실시간 연결됨');
+      }).catch(function (err) {
         console.warn('[합동 비서실] 실시간 DB 연결 실패:', err && err.message);
         setConn('error', '연결 실패 · 데모');
         var demo = new DemoStore();
