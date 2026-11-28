@@ -1622,15 +1622,41 @@
       p.hidden = !on;
       p.classList.toggle('is-active', on);
     });
-    if (name === 'db') {
-      var input = $('#db-input');
-      if (input) { input.value = storeGet(KEY.cfg) || ''; }
-    }
+    if (name === 'db') { syncDbPanel(); }
   }
 
   function dbUrlNow() {
     if (S.db && S.db.mode === 'live') { return S.db.url; }
     return '';
+  }
+
+  function dbUrlFromConfig() {
+    return parseDbUrl(CFG.databaseURL || (CFG.firebase && CFG.firebase.databaseURL) || '');
+  }
+
+  /* 입력창을 비워 두면 [연결 테스트]가 "주소 형식을 확인해 주세요"만 띄워
+     마치 연결이 안 된 것처럼 보입니다. 지금 실제로 쓰는 주소를 미리 채우고
+     상태 줄에도 어느 주소에 붙어 있는지 적어 둡니다. */
+  function syncDbPanel() {
+    var input = $('#db-input');
+    var st = $('#db-status');
+    var active = dbUrlNow();                       /* 지금 실시간으로 연결된 주소 */
+    var saved = parseDbUrl(storeGet(KEY.cfg) || '');
+    var cfgUrl = dbUrlFromConfig();
+    var shown = active || saved || cfgUrl;
+    if (input) { input.value = shown || ''; }
+    if (!st) { return; }
+    if (st.textContent === '확인 중…') { return; }  /* 테스트 중이면 그대로 둡니다 */
+    if (active) {
+      st.className = 'db-status ok';
+      st.textContent = '현재 연결된 주소: ' + active;
+    } else if (shown) {
+      st.className = 'db-status';
+      st.textContent = '데모 모드로 동작 중입니다. 이 주소로 연결할 수 있어요: ' + shown;
+    } else {
+      st.className = 'db-status';
+      st.textContent = '';
+    }
   }
 
   function fillInvite() {
