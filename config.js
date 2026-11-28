@@ -21,10 +21,11 @@
    ⚠️ 이 파일과 페이지에는 개인정보를 넣지 마세요. GitHub Pages는 공개됩니다.
    ══════════════════════════════════════════════════════════════ */
 window.OFFICE_CONFIG = {
-  databaseURL: '',
+  databaseURL: 'https://ai-office-fbc6e-default-rtdb.firebaseio.com',
 
   /* 전체 Firebase 설정 JSON을 그대로 붙여도 됩니다.
-     getDatabase() 설정 객체를 복사해 넣으면 databaseURL만 읽어 씁니다. */
+     getDatabase() 설정 객체를 복사해 넣으면 databaseURL만 읽어 씁니다.
+     위 databaseURL을 쓰므로 여기는 비워 둡니다. */
   firebase: {
     // apiKey: "",
     // authDomain: "",
