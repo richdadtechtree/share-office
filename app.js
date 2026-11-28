@@ -781,6 +781,7 @@
     unread: 0,
     unreadBy: {},
     meSynced: false,
+    mePlaced: false,
     boardSig: '',
     agendaSig: null,
     boardInit: false,
@@ -806,11 +807,15 @@
   function agentsList() {
     var list = Object.keys(S.data.agents || {}).map(function (k) { return S.data.agents[k]; })
       .filter(function (a) { return a && typeof a === 'object' && a.id; });
-    if (S.me && !S.data.agents[S.me.id]) {
+    /* 내 캐릭터는 실시간 DB에 아직 없거나 일부만 남아 있을 수 있습니다.
+       그때도 지도·명단에 늘 보이도록 내 캐릭터를 직접 채웁니다. */
+    var mine = S.data.agents && S.data.agents[S.me.id];
+    if (S.me && (!mine || !mine.id || !mine.name)) {
+      if (!S.me.pos) { S.me.pos = randomPos(S.me.zone || 'lounge'); }
       list.push({
         id: S.me.id, name: S.me.name, kind: S.me.kind, color: S.me.color,
         status: S.me.status || '여기 있어요', zone: S.me.zone || 'lounge',
-        pos: S.me.pos || randomPos('lounge'), tagline: '나', ts: Date.now(), updatedAt: Date.now()
+        pos: S.me.pos, tagline: '', ts: Date.now(), updatedAt: Date.now()
       });
     }
     return list.sort(function (a, b) {
@@ -1012,7 +1017,7 @@
     zoneId = normalizeZone(zoneId);
     var p = spawnPos(zoneId);
     S.db.patch('agents/' + id, { zone: zoneId, pos: p, updatedAt: Date.now() });
-    if (isMine(a)) { S.me.zone = zoneId; storeSet(KEY.me, JSON.stringify(S.me)); }
+    if (isMine(a)) { S.me.zone = zoneId; S.me.pos = p; S.mePlaced = true; storeSet(KEY.me, JSON.stringify(S.me)); }
     toast(a.name + ' → ' + zoneName(zoneId));
   }
 
@@ -1446,6 +1451,8 @@
     S.db.patch('agents/' + id, { pos: { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 }, zone: z, updatedAt: Date.now() });
     if (isMine(a)) {
       S.me.zone = z;
+      S.me.pos = { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+      S.mePlaced = true;
       storeSet(KEY.me, JSON.stringify(S.me));
     }
     ripple(x, y);
@@ -1635,7 +1642,7 @@
     /* 초대받은 AI는 자기 캐릭터를 새로 만듭니다. 사람(오피스 주인)의 캐릭터를
        덮어쓰지 않도록 예시 id·이름을 주인 캐릭터와 분리해 둡니다. */
     var owner = S.me;
-    var me = { id: 'ag-my-agent-01', name: lang === 'en' ? 'My AI' : '내 AI' };
+    var me = { id: 'ag-my-agent-01', name: lang === 'en' ? 'My AI' : '내 AI', kind: 'custom', color: '#eec257' };
     var dbLine = db || ('<먼저 Firebase Realtime Database 주소를 연결하세요>');
     var header = db
       ? ''
@@ -1913,19 +1920,23 @@
       votes: d.votes || {},
       meta: d.meta || {}
     };
-    if (!S.meSynced) {
-      S.meSynced = true;
-      ensureMe();
-    }
+    ensureMe();
     renderAll();
   }
 
   function ensureMe() {
     var a = S.data.agents[S.me.id];
-    if (!a) {
-      var myZone = (S.me.zone && S.me.zone !== 'lounge') ? normalizeZone(S.me.zone) : calmZone();
-      var p = spawnPos(myZone);
+    /* 전체 새로고침(20초 폴링) 뒤에 내 캐릭터가 빠지거나 일부 값만 남아 있으면
+       다시 채우고 실시간 DB에도 한 번 더 씁니다. */
+    if (!a || !a.id || !a.name) {
+      /* 한 번 자리를 잡은 뒤에는 내가 옮긴 곳을 그대로 지킵니다. */
+      var myZone = S.mePlaced
+        ? normalizeZone(S.me.zone || 'lounge')
+        : ((S.me.zone && S.me.zone !== 'lounge') ? normalizeZone(S.me.zone) : calmZone());
+      var p = (S.mePlaced && S.me.pos) ? S.me.pos : spawnPos(myZone);
+      S.mePlaced = true;
       S.me.zone = myZone;
+      S.me.pos = p;
       storeSet(KEY.me, JSON.stringify(S.me));
       var obj = {
         id: S.me.id, name: S.me.name, kind: S.me.kind, color: S.me.color,
@@ -1940,6 +1951,8 @@
       S.me.color = a.color || S.me.color;
       S.me.zone = normalizeZone(a.zone || S.me.zone);
       S.me.status = a.status || S.me.status;
+      if (a.pos && typeof a.pos.x === 'number') { S.me.pos = a.pos; }
+      S.mePlaced = true;
       storeSet(KEY.me, JSON.stringify(S.me));
     }
   }
@@ -2352,9 +2365,11 @@
     window.addEventListener('online', function () { toast('다시 연결되었어요'); if (S.db && S.db.refresh) { S.db.refresh(); } });
     window.addEventListener('offline', function () { toast('인터넷 연결이 끊겼어요 · 데모 화면은 계속 쓸 수 있어요', 3600); });
 
-    // 내 캐릭터 심박 (30초)
+    // 내 캐릭터 심박 (30초) — 사무실 명단에 내 자리가 있을 때만 갱신합니다.
     setInterval(function () {
       if (!S.db) { return; }
+      var mine = S.data.agents[S.me.id];
+      if (!mine || !mine.id) { return; }
       S.db.patch('agents/' + S.me.id, { updatedAt: Date.now() });
     }, 30000);
   }
