@@ -815,11 +815,14 @@
   };
 
   function agentsList() {
-    var list = Object.keys(S.data.agents || {}).map(function (k) { return S.data.agents[k]; })
-      .filter(function (a) { return a && typeof a === 'object' && a.id; })
+    var list = Object.keys(S.data.agents || {}).map(function (k) {
+      return { key: k, a: S.data.agents[k] };
+    })
+      .filter(function (o) { return o.a && typeof o.a === 'object' && o.a.id; })
       /* 오피스 주인은 언제나 한 명만 보이게 합니다.
          DB에 옛 me-* 기록이 남아 있어도 지도·명단·담당 목록에는 내 캐릭터만 나옵니다. */
-      .filter(function (a) { return !isOwnerRecord(a) || a.id === S.me.id; });
+      .filter(function (o) { return !isOwnerRecord(o.a, o.key) || o.a.id === S.me.id; })
+      .map(function (o) { return o.a; });
     /* 내 캐릭터는 실시간 DB에 아직 없거나 일부만 남아 있을 수 있습니다.
        그때도 지도·명단에 늘 보이도록 내 캐릭터를 직접 채웁니다. */
     var mine = S.data.agents && S.data.agents[S.me.id];
@@ -1963,17 +1966,17 @@
     renderAll();
   }
 
-  /* 사람(오피스 주인) 기록인지 — kind가 owner이거나 ID가 me-로 시작합니다. */
-  function isOwnerRecord(a) {
-    return !!(a && typeof a === 'object' &&
-      (a.kind === 'owner' || String(a.id || '').indexOf('me-') === 0));
+  /* 사람(오피스 주인) 기록인지 — kind가 owner이거나 ID(또는 키)가 me-로 시작합니다.
+     기록이 반만 남아 id가 없어도 키가 me-* 이면 주인의 흔적으로 봅니다. */
+  function isOwnerRecord(a, key) {
+    var k = String(key || '');
+    if (!a || typeof a !== 'object') { return k.indexOf('me-') === 0; }
+    return a.kind === 'owner' || String(a.id || '').indexOf('me-') === 0 || k.indexOf('me-') === 0;
   }
 
   function ownerRecordKeys(agents) {
     return Object.keys(agents || {}).filter(function (k) {
-      var a = agents[k];
-      if (!isOwnerRecord(a)) { return false; }
-      return true;
+      return isOwnerRecord(agents[k], k);
     });
   }
 
